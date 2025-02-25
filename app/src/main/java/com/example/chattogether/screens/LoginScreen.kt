@@ -1,7 +1,7 @@
 package com.example.grocio.screens
 
-import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,12 +31,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.chattogether.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController?, viewModel: AuthViewModel = viewModel(), onLoginSuccess: () -> Unit) {
+fun LoginScreen(navController: NavController?,
+                viewModel: AuthViewModel = viewModel(),
+                onLoginSuccess: () -> Unit,
+                onSignUpClick: () -> Unit) {
 
 
     var email by remember { mutableStateOf("") }
@@ -100,11 +103,16 @@ fun LoginScreen(navController: NavController?, viewModel: AuthViewModel = viewMo
         }
 
 
-        Text(modifier = Modifier
-            .align(Alignment.End)
-            .padding(end = 15.dp),
+        Text(
             text = "SignUp here!",
-            color = Color.Blue)
+            color = Color.Blue,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = 15.dp)
+                .clickable {
+                    onSignUpClick()
+                }
+        )
 
     }
 }
@@ -132,6 +140,6 @@ fun LoginScreen(navController: NavController?, viewModel: AuthViewModel = viewMo
 @Composable
 fun LoginPreview() {
     MaterialTheme {
-        LoginScreen(navController = null,onLoginSuccess = {})
+        LoginScreen(navController = null,onLoginSuccess = {}, onSignUpClick = {})
     }
 }

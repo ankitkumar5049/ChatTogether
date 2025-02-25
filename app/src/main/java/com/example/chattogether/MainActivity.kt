@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.chattogether.screens.Dashboard
 import com.example.grocio.navigation.Screen
 import com.example.grocio.screens.LoginScreen
+import com.example.grocio.screens.SignUpScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,11 +32,18 @@ class MainActivity : ComponentActivity() {
                 startDestination = Screen.Login.route
             ) {
                 composable(Screen.Login.route) {
-                    LoginScreen(navController) {
-                        navController.navigate(Screen.Main.route) // Navigate to Dashboard on success
-                    }
+                    LoginScreen(
+                        navController = navController,
+                        onLoginSuccess = { navController.navigate(Screen.Main.route) },
+                        onSignUpClick = { navController.navigate(Screen.SignUp.route) }
+                    )
                 }
-                composable(Screen.Main.route) { Dashboard(navController) }
+                composable(Screen.SignUp.route) {
+                    SignUpScreen(navController = navController)
+                }
+                composable(Screen.Main.route) {
+                    Dashboard(navController)
+                }
             }
         }
     }

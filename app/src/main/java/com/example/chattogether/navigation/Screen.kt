@@ -10,5 +10,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 sealed class Screen(val route: String) {
      object Login: Screen("login_screen")
      object Main: Screen("main_screen")
+     object SignUp: Screen("signup_screen")
 }
 

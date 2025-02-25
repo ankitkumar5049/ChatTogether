@@ -32,10 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.chattogether.viewmodel.AuthViewModel
 
 @Composable
-fun SignupScreen(viewModel: AuthViewModel = viewModel()) {
+fun SignUpScreen(navController: NavController?, viewModel: AuthViewModel = viewModel()) {
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -157,6 +158,6 @@ fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: Stri
 @Composable
 fun SignupPreview() {
     MaterialTheme {
-        SignupScreen()
+        SignUpScreen(navController = null)
     }
 }
