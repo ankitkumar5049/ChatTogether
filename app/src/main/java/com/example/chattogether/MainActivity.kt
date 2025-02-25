@@ -19,14 +19,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val navController = rememberNavController()
 
-//            NavHost(
-//                navController = navController,
-//                startDestination = Screen.Login.route
-//            ) {
-//                composable(Screen.Login.route) { LoginScreen(navController) }
-//                composable(Screen.Main.route) { Dashboard(navController) }
-//            }
-
             NavHost(
                 navController = navController,
                 startDestination = Screen.Login.route
@@ -34,12 +26,21 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Login.route) {
                     LoginScreen(
                         navController = navController,
-                        onLoginSuccess = { navController.navigate(Screen.Main.route) },
-                        onSignUpClick = { navController.navigate(Screen.SignUp.route) }
+                        onLoginSuccess = { navController.navigate(Screen.Main.route){
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        } },
+                        onSignUpClick = { navController.navigate(Screen.SignUp.route){
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        } }
                     )
                 }
-                composable(Screen.SignUp.route) {
-                    SignUpScreen(navController = navController)
+                composable(route = Screen.SignUp.route) {
+                    SignUpScreen(
+                        navController = navController,
+                        onLoginClick = {navController.navigate(Screen.Login.route){
+                            popUpTo(Screen.SignUp.route) { inclusive = true }
+                        } }
+                    )
                 }
                 composable(Screen.Main.route) {
                     Dashboard(navController)

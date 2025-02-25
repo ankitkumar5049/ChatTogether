@@ -2,6 +2,7 @@ package com.example.grocio.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,9 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.viewmodel.AuthViewModel
+import com.example.grocio.navigation.Screen
 
 @Composable
-fun SignUpScreen(navController: NavController?, viewModel: AuthViewModel = viewModel()) {
+fun SignUpScreen(navController: NavController?,
+                 viewModel: AuthViewModel = viewModel(),
+                 onLoginClick: () -> Unit) {
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -110,6 +114,7 @@ fun SignUpScreen(navController: NavController?, viewModel: AuthViewModel = viewM
             onValueChange = { confirmPassword = it },
             singleLine = true,
             label = { Text("Confirm Password") },
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         )
 
@@ -125,7 +130,11 @@ fun SignUpScreen(navController: NavController?, viewModel: AuthViewModel = viewM
                 phone,
                 password,
                 confirmPassword,
-                context)
+                context){
+                    navController?.navigate(Screen.Main.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true } // Clears SignUp from back stack
+                    }
+                }
                        },
             colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
         {
@@ -136,17 +145,24 @@ fun SignUpScreen(navController: NavController?, viewModel: AuthViewModel = viewM
 
         Text(modifier = Modifier
             .align(Alignment.End)
-            .padding(end = 15.dp),
+            .padding(end = 15.dp)
+            .clickable{
+                onLoginClick()
+            },
             text = "Already have an account! Login here",
             color = Color.Blue)
 
     }
 }
 
-fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: String, password: String, confirmPassword: String, context: Context) {
+fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: String, password: String,
+              confirmPassword: String, context: Context, onSuccess: () -> Unit) {
     if (viewModel.checkValidation(name, phone, password, email, confirmPassword)) {
         viewModel.signUp(name, email, phone, password) { isSuccess, message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+            if (isSuccess) {
+                onSuccess() // Navigate if sign-up is successful
+            }
         }
     } else {
         Toast.makeText(context, "Please verify the details", Toast.LENGTH_SHORT).show()
@@ -158,6 +174,6 @@ fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: Stri
 @Composable
 fun SignupPreview() {
     MaterialTheme {
-        SignUpScreen(navController = null)
+        SignUpScreen(navController = null, onLoginClick = {})
     }
 }
