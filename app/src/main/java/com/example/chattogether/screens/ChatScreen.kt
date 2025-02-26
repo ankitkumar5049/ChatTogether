@@ -13,8 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.viewmodel.ChatViewModel
@@ -27,7 +29,17 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
     var chatId by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
     var messages by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
+    var otherUserName by remember { mutableStateOf(otherUserId) }
 
+    // Fetch user name from Firestore
+    LaunchedEffect(otherUserId) {
+        db.collection("users").document(otherUserId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    otherUserName = document.getString("name") ?: ""
+                }
+            }
+    }
     // Fetch or create chat room
     LaunchedEffect(Unit) {
         viewModel.getOrCreateChatRoom(db, userId, otherUserId) { id ->
@@ -43,11 +55,21 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
+            .padding(20.dp)
     ) {
         Text(
-            text = "Chat with $otherUserId",
+            textAlign = TextAlign.Center,
+            text = "Chat Screen",
             style = MaterialTheme.typography.titleMedium,
+            fontSize = 25.sp,
+            modifier = Modifier.padding(bottom = 10.dp)
+        )
+
+        Text(
+            text = "Chatting with $otherUserName",
+            style = MaterialTheme.typography.titleMedium,
+            fontSize = 18.sp,
+            color = Color.Gray,
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
