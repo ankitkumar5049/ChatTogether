@@ -32,10 +32,13 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chattogether.utils.UserPreferences
 import com.example.chattogether.viewmodel.AuthViewModel
 import com.example.grocio.navigation.Screen
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignUpScreen(navController: NavController?,
@@ -157,11 +160,15 @@ fun SignUpScreen(navController: NavController?,
 
 fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: String, password: String,
               confirmPassword: String, context: Context, onSuccess: () -> Unit) {
+    val userPreferences = UserPreferences(context)
     if (viewModel.checkValidation(name, phone, password, email, confirmPassword)) {
         viewModel.signUp(name, email, phone, password) { isSuccess, message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             if (isSuccess) {
-                onSuccess() // Navigate if sign-up is successful
+                viewModel.viewModelScope.launch {
+                    userPreferences.saveUserCredentials(email, password)
+                    onSuccess() // Navigate to the main screen
+                } // Navigate if sign-up is successful
             }
         }
     } else {

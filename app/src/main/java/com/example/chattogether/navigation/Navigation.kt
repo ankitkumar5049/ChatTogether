@@ -1,10 +1,11 @@
-package com.example.grocio.navigation
+package com.example.chattogether.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chattogether.screens.Dashboard
+import com.example.grocio.navigation.Screen
 import com.example.grocio.screens.LoginScreen
 import com.example.grocio.screens.SignUpScreen
 
@@ -27,7 +28,9 @@ fun Navigation() {
             )
         }
         composable(route = Screen.Main.route) {
-            Dashboard()
+            Dashboard(
+                navController = navController
+            )
         }
     }
 }
