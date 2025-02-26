@@ -15,12 +15,30 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chattogether.viewmodel.ChatViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun ChatScreen(navController: NavController?, userEmail: String) {
+fun ChatScreen(navController: NavController?, userId: String, otherUserId: String, viewModel: ChatViewModel= viewModel()) {
+    val db = FirebaseFirestore.getInstance()
+
+    var chatId by remember { mutableStateOf<String?>(null) }
     var message by remember { mutableStateOf(TextFieldValue("")) }
-    var messages by remember { mutableStateOf(listOf<String>()) }
+    var messages by remember { mutableStateOf<List<Map<String, Any>>>(emptyList()) }
+
+    // Fetch or create chat room
+    LaunchedEffect(Unit) {
+        viewModel.getOrCreateChatRoom(db, userId, otherUserId) { id ->
+            chatId = id
+            if (id.isNotBlank()) {
+                viewModel.listenForMessages(db, id) { newMessages ->
+                    messages = newMessages
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -28,7 +46,7 @@ fun ChatScreen(navController: NavController?, userEmail: String) {
             .padding(10.dp)
     ) {
         Text(
-            text = "Chat with $userEmail",
+            text = "Chat with $otherUserId",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(bottom = 10.dp)
         )
@@ -39,7 +57,9 @@ fun ChatScreen(navController: NavController?, userEmail: String) {
                 .verticalScroll(rememberScrollState())
         ) {
             messages.forEach { msg ->
-                ChatBubble(message = msg, isSentByUser = msg.contains("You:"))
+                val senderId = msg["senderId"] as? String ?: ""
+                val text = msg["message"] as? String ?: ""
+                ChatBubble(message = text, isSentByUser = senderId == userId)
             }
         }
 
@@ -60,8 +80,8 @@ fun ChatScreen(navController: NavController?, userEmail: String) {
             Spacer(modifier = Modifier.width(8.dp))
 
             Button(onClick = {
-                if (message.text.isNotBlank()) {
-                    messages = messages + "You: ${message.text}"
+                if (message.text.isNotBlank() && chatId != null) {
+                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, message.text)
                     message = TextFieldValue("")
                 }
             }) {
@@ -92,8 +112,10 @@ fun ChatBubble(message: String, isSentByUser: Boolean) {
     }
 }
 
+
+
 @Preview(showBackground = true)
 @Composable
 fun ChatScreenPreview() {
-    ChatScreen(navController = null, userEmail = "test@example.com")
+    ChatScreen(navController = null,"","")
 }

@@ -1,4 +1,4 @@
-package com.example.grocio.screens
+package com.example.chattogether.screens
 
 import android.content.Context
 import android.widget.Toast
@@ -37,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.utils.UserPreferences
 import com.example.chattogether.viewmodel.AuthViewModel
-import com.example.grocio.navigation.Screen
+import com.example.chattogether.navigation.Screen
 import kotlinx.coroutines.launch
 
 @Composable

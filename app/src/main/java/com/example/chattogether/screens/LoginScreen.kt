@@ -1,4 +1,4 @@
-package com.example.grocio.screens
+package com.example.chattogether.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
