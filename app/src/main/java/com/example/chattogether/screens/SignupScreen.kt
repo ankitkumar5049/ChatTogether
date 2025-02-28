@@ -2,13 +2,18 @@ package com.example.chattogether.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -22,8 +27,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -35,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chattogether.R
 import com.example.chattogether.utils.UserPreferences
 import com.example.chattogether.viewmodel.AuthViewModel
 import com.example.chattogether.navigation.Screen
@@ -59,13 +68,17 @@ fun SignUpScreen(navController: NavController?,
         verticalArrangement = Arrangement.Center) {
 
 
-        Text(modifier = Modifier
-            .padding(5.dp),
-            fontStyle = FontStyle.Normal,
-            style = TextStyle.Default,
-            maxLines = 1,
-            fontSize = 30.sp,
-            text = loginText)
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
+            contentDescription = "Profile Image",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape) // Makes it round
+                .border(2.dp, Color.White, CircleShape), // Optional border
+            contentScale = ContentScale.Crop // Ensures image fills the circle
+        )
+
+        Spacer(modifier = Modifier.padding(25.dp))
 
         OutlinedTextField(
             modifier = Modifier
@@ -123,6 +136,7 @@ fun SignUpScreen(navController: NavController?,
 
         Spacer(modifier = Modifier.padding(10.dp))
 
+        val buttonColor = if (isSystemInDarkTheme()) Color(0xFF448AFF) else Color(0xFF536DFE)
         Button(modifier = Modifier
             .fillMaxWidth()
             .padding(15.dp)
@@ -139,10 +153,9 @@ fun SignUpScreen(navController: NavController?,
                     }
                 }
                        },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray))
+            colors = ButtonDefaults.buttonColors(containerColor = buttonColor))
         {
-            Text(text = "SignUp",
-                color = Color.Black)
+            Text(text = "SignUp",)
         }
 
 
@@ -153,7 +166,7 @@ fun SignUpScreen(navController: NavController?,
                 onLoginClick()
             },
             text = "Already have an account! Login here",
-            color = Color.Blue)
+            )
 
     }
 }
