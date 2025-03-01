@@ -12,13 +12,6 @@ A real-time chat application built using **Jetpack Compose** and **Firebase**, a
 ✅ **User Search**: Find users by email and start a conversation.  
 ✅ **Navigation with Jetpack Compose**: Smooth UI navigation between screens.  
 
----
-
-## Folder Structure
-📂 ChatTogether ┣ 📂 app/src/main/java/com/example/chattogether ┃ ┣ 📂 screens # All UI screens (Login, Signup, Chat, Dashboard) ┃ ┣ 📂 navigation # Navigation setup ┃ ┣ 📂 models # Data models for Firestore ┃ ┣ 📂 utils # Utility functions (e.g., Firebase helper) ┃ ┗ MainActivity.kt # Entry point of the app ┣ 📜 README.md # Documentation ┣ 📜 build.gradle # Project dependencies ┣ 📜 google-services.json # Firebase configuration
-
-ChatTogether/ ├── app/ │ ├── src/main/java/com/example/chattogether/ │ │ ├── screens/ # All UI screens (Login, Signup, Chat, Dashboard) │ │ ├── navigation/ # Navigation setup │ │ ├── models/ # Data models for Firestore │ │ ├── utils/ # Utility functions (e.g., Firebase helper) │ │ ├── MainActivity.kt # Entry point of the app ├── README.md # Documentation ├── build.gradle # Project dependencies ├── google-services.json # Firebase configuration
-
 
 ## Upcoming Features  
 🚀 **Profile Pictures** - Users can upload profile images.  
