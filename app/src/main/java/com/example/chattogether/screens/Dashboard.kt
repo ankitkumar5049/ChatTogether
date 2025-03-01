@@ -37,18 +37,25 @@ fun Dashboard(navController: NavController?) {
     LaunchedEffect(Unit) {
         getUserChats(db, currentUserId) { chatRooms ->
             if (chatRooms.isNotEmpty()) {
-                val usersList = chatRooms.mapNotNull { chat ->
+                val usersList = mutableListOf<Pair<String, String>>()
+
+                chatRooms.forEach { chat ->
                     val user1 = chat["user1"] as? String
                     val user2 = chat["user2"] as? String
                     val otherUserId = if (user1 == currentUserId) user2 else user1
 
                     if (!otherUserId.isNullOrBlank()) {
-                        otherUserId to (chat["userName"] as? String ?: "Unknown User")
-                    } else {
-                        null
+                        db.collection("users").document(otherUserId).get()
+                            .addOnSuccessListener { document ->
+                                val userName = document.getString("name") ?: "Unknown User"
+                                usersList.add(otherUserId to userName)
+                                chatUsers = usersList.toList()
+                            }
+                            .addOnFailureListener {
+                                Log.e("Dashboard", "Error fetching user name", it)
+                            }
                     }
                 }
-                chatUsers = usersList
             } else {
                 Log.d("Dashboard", "No chats found")
             }
