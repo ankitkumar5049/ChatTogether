@@ -17,14 +17,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.navigation.Screen
+import com.example.chattogether.viewmodel.DashboardViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
-fun Dashboard(navController: NavController?) {
+fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = viewModel()) {
     val context = LocalContext.current
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
@@ -35,7 +37,7 @@ fun Dashboard(navController: NavController?) {
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        getUserChats(db, currentUserId) { chatRooms ->
+        viewModel.getUserChats(db, currentUserId) { chatRooms ->
             if (chatRooms.isNotEmpty()) {
                 val usersList = mutableListOf<Pair<String, String>>()
 
@@ -69,15 +71,19 @@ fun Dashboard(navController: NavController?) {
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top
     ) {
-        Text(text = "Chats", style = MaterialTheme.typography.headlineMedium)
-
+        Text(text = "Chats",
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Start)
+                .padding(top = 15.dp),
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
@@ -85,7 +91,9 @@ fun Dashboard(navController: NavController?) {
                 onValueChange = { email = it },
                 label = { Text("Enter email to search") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                modifier = Modifier.weight(1f).padding(5.dp)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(5.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -96,7 +104,7 @@ fun Dashboard(navController: NavController?) {
                     if (email.isNotEmpty()) {
                         isLoading = true
                         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                        searchUserByEmail(db, email, navController!!, currentUserId)
+                        viewModel.searchUserByEmail(db, email, navController!!, currentUserId)
 
                     } else {
                         Toast.makeText(context, "Enter an email", Toast.LENGTH_SHORT).show()
@@ -156,66 +164,6 @@ fun ChatListItem(userName: String, onClick: () -> Unit) {
         }
     }
 }
-
-fun getUserChats(db: FirebaseFirestore, userId: String, onResult: (List<Map<String, Any>>) -> Unit) {
-    val chatRooms = mutableListOf<Map<String, Any>>()
-
-    db.collection("chats")
-        .whereEqualTo("user1", userId)
-        .get()
-        .addOnSuccessListener { querySnapshot1 ->
-            querySnapshot1.documents.mapNotNullTo(chatRooms) { it.data }
-
-            db.collection("chats")
-                .whereEqualTo("user2", userId)
-                .get()
-                .addOnSuccessListener { querySnapshot2 ->
-                    querySnapshot2.documents.mapNotNullTo(chatRooms) { it.data }
-                    onResult(chatRooms)
-                }
-                .addOnFailureListener {
-                    Log.e("getUserChats", "Error fetching user2 chats", it)
-                    onResult(chatRooms)
-                }
-        }
-        .addOnFailureListener {
-            Log.e("getUserChats", "Error fetching user1 chats", it)
-            onResult(emptyList())
-        }
-}
-
-fun searchUserByEmail(
-    db: FirebaseFirestore,
-    email: String,
-    navController: NavController,
-    currentUserId: String
-) {
-    db.collection("users")
-        .whereEqualTo("email", email)
-        .get()
-        .addOnSuccessListener { documents ->
-            if (!documents.isEmpty) {
-                for (document in documents) {
-                    val otherUserId = document.id
-                    println("User found: $otherUserId")
-
-                    // Navigate to ChatScreen with userId
-                    val chatRoute = Screen.Chats.route
-                        .replace("{currentUserId}", currentUserId)
-                        .replace("{otherUserId}", otherUserId)
-
-                    navController.navigate(chatRoute)
-                    return@addOnSuccessListener
-                }
-            } else {
-                println("No user found")
-            }
-        }
-        .addOnFailureListener { exception ->
-            println("Error getting user: ${exception.message}")
-        }
-}
-
 
 
 
