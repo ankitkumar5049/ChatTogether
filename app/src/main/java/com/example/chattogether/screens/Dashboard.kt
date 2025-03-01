@@ -9,10 +9,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,7 +72,7 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -156,7 +159,14 @@ fun ChatListItem(userName: String, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-            )
+            ){
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Person",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp).align(Alignment.Center)
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 

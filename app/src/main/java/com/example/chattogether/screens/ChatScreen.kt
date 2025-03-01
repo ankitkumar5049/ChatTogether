@@ -58,11 +58,12 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
             .padding(20.dp)
     ) {
         Text(
-            textAlign = TextAlign.Center,
             text = "Chat Screen",
-            style = MaterialTheme.typography.titleMedium,
-            fontSize = 25.sp,
-            modifier = Modifier.padding(bottom = 10.dp)
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Start)
+                .padding(top = 15.dp, bottom = 10.dp),
         )
 
         Text(
