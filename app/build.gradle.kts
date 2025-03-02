@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.firestore.ktx)
     implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,4 +84,5 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     //Encryption
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
