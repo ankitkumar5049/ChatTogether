@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Attachment
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.chattogether.viewmodel.ChatViewModel
+import com.google.android.gms.fido.fido2.api.common.Attachment
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -81,10 +83,12 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
             .padding(20.dp)
     ) {
         Text(
-            text = "Chatting with $otherUserName",
-            fontSize = 18.sp,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 10.dp)
+            text = "Chat Screen",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Start)
+                .padding(top = 15.dp, bottom = 10.dp),
         )
 
         Column(
@@ -112,7 +116,7 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
                 placeholder = { Text("Type a message...") },
                 trailingIcon = {
                     IconButton(onClick = { launcher.launch("*/*") }) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "Attach File")
+                        Icon(imageVector = Icons.Default.Attachment, contentDescription = "Attach File")
                     }
                 }
             )
