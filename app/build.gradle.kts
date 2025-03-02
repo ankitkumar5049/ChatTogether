@@ -81,4 +81,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     //shared-preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    //Encryption
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }
