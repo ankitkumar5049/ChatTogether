@@ -19,15 +19,31 @@ fun Navigation() {
         composable(route = Screen.Login.route) {
             LoginScreen(
                 navController = navController,
-                onLoginSuccess = { navController.navigate(Screen.Main.route) },
-                onSignUpClick = { navController.navigate(Screen.SignUp.route) }
+                onLoginSuccess = {
+                    navController.navigate(Screen.Main.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true } // Removes Login from back stack
+                        launchSingleTop = true // Prevents duplicate instances
+                    }
+                                 },
+                onSignUpClick = {
+                    navController.navigate(Screen.SignUp.route){
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
         composable(route = Screen.SignUp.route) {
             SignUpScreen(
                 navController = navController,
-                onLoginClick = {navController.navigate(Screen.Login.route)}
+                onLoginClick = {
+                    navController.navigate(Screen.Login.route)
+                    {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
