@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.R
+import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.AuthViewModel
 
 @Composable
@@ -103,6 +104,7 @@ fun LoginScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
+                AppSession.putString("email", email)
                 viewModel.login(email, password) { success ->
                     if (success) {
                         onLoginSuccess()  // Navigate to Dashboard

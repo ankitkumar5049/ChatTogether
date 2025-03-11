@@ -10,11 +10,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.chattogether.navigation.Navigation
 import com.example.chattogether.ui.theme.ChatTogetherTheme
+import com.example.chattogether.utils.AppSession
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        AppSession.initialize(this)
         setContent {
             ChatTogetherTheme {
                 Surface(

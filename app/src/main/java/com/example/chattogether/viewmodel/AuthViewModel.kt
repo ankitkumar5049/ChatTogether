@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.chattogether.db.UserDatabase
 import com.example.chattogether.db.entities.User
 import com.example.chattogether.db.repo.UserRepository
+import com.example.chattogether.utils.AppSession
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -27,6 +28,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: ""
+                        AppSession.putString("userId", userId)
                         val user = hashMapOf(
                             "user_id" to userId,
                             "name" to name,
@@ -43,13 +45,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                                     User(name = name, email = email, password = password, phone = phone)
                                 )
 
-                                getUserByEmail(email) { fetchedUser ->
-                                    if (fetchedUser != null) {
-                                        Log.d("TAG", "signUp: $fetchedUser")
-                                    } else {
-                                        Log.d("TAG", "signUp: user not found")
-                                    }
-                                }
+//                                getUserByEmail(email) { fetchedUser ->
+//                                    if (fetchedUser != null) {
+//                                        Log.d("TAG", "signUp: $fetchedUser")
+//                                    } else {
+//                                        Log.d("TAG", "signUp: user not found")
+//                                    }
+//                                }
                             }
                             .addOnFailureListener { e ->
                                 onResult(false, "Failed to save user: ${e.message}")
@@ -96,10 +98,4 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getUserByEmail(email: String, onResult: (User?) -> Unit) {
-        viewModelScope.launch {
-            val user = repository.getUserByEmail(email)
-            onResult(user)
-        }
-    }
 }

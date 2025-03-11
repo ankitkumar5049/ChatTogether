@@ -47,6 +47,7 @@ import com.example.chattogether.R
 import com.example.chattogether.utils.UserPreferences
 import com.example.chattogether.viewmodel.AuthViewModel
 import com.example.chattogether.navigation.Screen
+import com.example.chattogether.utils.AppSession
 import kotlinx.coroutines.launch
 
 @Composable
@@ -141,6 +142,7 @@ fun SignUpScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
+                AppSession.putString("email", email)
                 authSetup(viewModel,
                 name,
                 email,
