@@ -1,6 +1,5 @@
 package com.example.chattogether.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -42,7 +40,7 @@ import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
+fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
@@ -56,14 +54,14 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
         }
     }
 
-    val gradientBrush = Brush.verticalGradient(
-        colors = listOf(Color(0xFF3F51B5), Color(0xFF536DFE)) // Gradient for background
-    )
+//    val gradientBrush = Brush.verticalGradient(
+//        colors = listOf(Color(0xFF3F51B5), Color(0xFF536DFE)) // Gradient for background
+//    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(gradientBrush) // Background gradient
+//            .background(gradientBrush) // Background gradient
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -112,14 +110,14 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel()) {
             val buttonColor = if (isSystemInDarkTheme()) Color(0xFF448AFF) else Color(0xFF536DFE)
             Button(modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp)
+                .padding(start = 10.dp, end = 10.dp)
                 ,onClick = {
+                    onLoginClick()
                     profileViewModel.logout()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = buttonColor))
             {
-                Text(text = "Logout",
-                )
+                Text(text = "Logout")
             }
         }
 
@@ -142,5 +140,5 @@ fun ProfileItem(label: String, value: String) {
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen()
+    ProfileScreen(onLoginClick = {})
 }

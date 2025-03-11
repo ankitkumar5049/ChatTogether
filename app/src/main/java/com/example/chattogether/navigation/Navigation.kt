@@ -84,7 +84,12 @@ fun Navigation() {
                     HomeScreen()
                 }
                 composable(route = Screen.Profile.route) {
-                    ProfileScreen()
+                    ProfileScreen(onLoginClick = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    })
                 }
                 composable(route = Screen.Help.route) {
                     HelpScreen()
