@@ -23,6 +23,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // Sign up with Name, Phone, and Password
     fun signUp(name: String, email: String, phone: String, password: String, onResult: (Boolean, String) -> Unit) {
+        AppSession.putString("email", email)
+        AppSession.putString("password", password)
         viewModelScope.launch {
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
@@ -65,6 +67,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // Login with Phone and Password
     fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
+        AppSession.putString("email", email)
+        AppSession.putString("password", password)
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {

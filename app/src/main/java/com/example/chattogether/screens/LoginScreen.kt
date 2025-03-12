@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,12 @@ fun LoginScreen(navController: NavController?,
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        email = AppSession.getString("email")?:""
+        password = AppSession.getString("password")?:""
+    }
+
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
@@ -104,7 +111,6 @@ fun LoginScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
-                AppSession.putString("email", email)
                 viewModel.login(email, password) { success ->
                     if (success) {
                         onLoginSuccess()  // Navigate to Dashboard
