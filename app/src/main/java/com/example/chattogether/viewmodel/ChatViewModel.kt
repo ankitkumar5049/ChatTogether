@@ -8,6 +8,9 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.UUID
 
 class ChatViewModel: ViewModel() {
@@ -84,9 +87,21 @@ class ChatViewModel: ViewModel() {
                     return@addSnapshotListener
                 }
 
-                val messages = snapshot?.documents?.map { it.data!! } ?: emptyList()
+//                val messages = snapshot?.documents?.map { it.data!! } ?: emptyList()
+                val messages = snapshot?.documents?.map { document ->
+                    val data = document.data ?: emptyMap()
+                    val timestamp = data["timestamp"] as? com.google.firebase.Timestamp
+                    val formattedTime = timestamp?.toDate()?.let { formatTimestamp(it) } ?: "Unknown"
+
+                    data + ("formattedTime" to formattedTime) // Add formatted timestamp to map
+                } ?: emptyList()
                 onMessageReceived(messages)
             }
+    }
+
+    fun formatTimestamp(date: Date): String {
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault()) // Format: 12:42 PM
+        return sdf.format(date)
     }
 
 

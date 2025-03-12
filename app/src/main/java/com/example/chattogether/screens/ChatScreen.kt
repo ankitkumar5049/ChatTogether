@@ -46,6 +46,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.ChatViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -122,7 +123,8 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
                 val text = msg["message"] as? String
                 val fileUrl = msg["fileUrl"] as? String
                 val type = msg["fileType"] as? String
-                ChatBubble(text, fileUrl, type, senderId == userId)
+                val time = msg["formattedTime"] as? String?: ""
+                ChatBubble(text, fileUrl, type, senderId == userId, time)
             }
         }
 
@@ -157,7 +159,13 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
 }
 
 @Composable
-fun ChatBubble(message: String?, fileUrl: String?, fileType: String?, isSentByUser: Boolean) {
+fun ChatBubble(
+    message: String?,
+    fileUrl: String?,
+    fileType: String?,
+    isSentByUser: Boolean,
+    timestamp: String // Pass timestamp as a parameter
+) {
     val context = LocalContext.current
     Box(
         modifier = Modifier
@@ -165,40 +173,52 @@ fun ChatBubble(message: String?, fileUrl: String?, fileType: String?, isSentByUs
             .padding(5.dp)
             .wrapContentSize(if (isSentByUser) Alignment.CenterEnd else Alignment.CenterStart)
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    color = if (isSentByUser) Color.Blue else Color.Gray,
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(10.dp)
+        Column(
+            horizontalAlignment = if (isSentByUser) Alignment.End else Alignment.Start
         ) {
-            Column {
-                if (!message.isNullOrEmpty()) {
-                    Text(text = message, color = Color.White)
-                }
-                if (!fileUrl.isNullOrEmpty()) {
-                    if (fileType == "image") {
-                        AsyncImage(
-                            model = fileUrl,
-                            contentDescription = "Sent Image",
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                        )
-                    } else {
-                        Text(
-                            text = "📄 Document",
-                            color = Color.Yellow,
-                            fontSize = 14.sp,
-                            modifier = Modifier.clickable {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl))
-                                startActivity(context, intent, null)
-                            }
-                        )
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = if (isSentByUser) Color.Blue else Color.Gray,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .padding(10.dp)
+            ) {
+                Column {
+                    if (!message.isNullOrEmpty()) {
+                        Text(text = message, color = Color.White)
+                    }
+                    if (!fileUrl.isNullOrEmpty()) {
+                        if (fileType == "image") {
+                            AsyncImage(
+                                model = fileUrl,
+                                contentDescription = "Sent Image",
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                            )
+                        } else {
+                            Text(
+                                text = "📄 Document",
+                                color = Color.Yellow,
+                                fontSize = 14.sp,
+                                modifier = Modifier.clickable {
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(fileUrl))
+                                    startActivity(context, intent, null)
+                                }
+                            )
+                        }
                     }
                 }
             }
+
+            // Timestamp
+            Text(
+                text = timestamp,
+                fontSize = 12.sp,
+                color = Color.LightGray,
+                modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
+            )
         }
     }
 }
@@ -206,8 +226,9 @@ fun ChatBubble(message: String?, fileUrl: String?, fileType: String?, isSentByUs
 
 
 
+
 @Preview(showBackground = true)
 @Composable
 fun ChatScreenPreview() {
-    ChatScreen(navController = null,"","")
+    ChatBubble("Hii","","", true, "12:12 Am")
 }
