@@ -23,10 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.navigation.Screen
+import com.example.chattogether.utils.AppSession
+import com.example.chattogether.utils.Constant
 import com.example.chattogether.viewmodel.DashboardViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 @Composable
 fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = viewModel()) {
@@ -40,30 +44,42 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        viewModel.getUserChats(db, currentUserId) { chatRooms ->
-            if (chatRooms.isNotEmpty()) {
-                val usersList = mutableListOf<Pair<String, String>>()
+        val json = AppSession.getString(Constant.USERS_LIST)
+        val type = object : TypeToken<List<Pair<String, String>>>() {}.type
+        chatUsers = Gson().fromJson(json, type)?: emptyList()
 
-                chatRooms.forEach { chat ->
-                    val user1 = chat["user1"] as? String
-                    val user2 = chat["user2"] as? String
-                    val otherUserId = if (user1 == currentUserId) user2 else user1
 
-                    if (!otherUserId.isNullOrBlank()) {
-                        db.collection("users").document(otherUserId).get()
-                            .addOnSuccessListener { document ->
-                                val userName = document.getString("name") ?: "Unknown User"
-                                usersList.add(otherUserId to userName)
-                                chatUsers = usersList.toList()
-                            }
-                            .addOnFailureListener {
-                                Log.e("Dashboard", "Error fetching user name", it)
-                            }
+        if(chatUsers.isEmpty()){
+            viewModel.getUserChats(db, currentUserId) { chatRooms ->
+                if (chatRooms.isNotEmpty()) {
+                    val usersList = mutableListOf<Pair<String, String>>()
+
+                    chatRooms.forEach { chat ->
+                        val user1 = chat["user1"] as? String
+                        val user2 = chat["user2"] as? String
+                        val otherUserId = if (user1 == currentUserId) user2 else user1
+
+                        if (!otherUserId.isNullOrBlank()) {
+                            db.collection("users").document(otherUserId).get()
+                                .addOnSuccessListener { document ->
+                                    val userName = document.getString("name") ?: "Unknown User"
+                                    usersList.add(otherUserId to userName)
+                                    chatUsers = usersList.toList()
+                                    AppSession.putObject(Constant.USERS_LIST, chatUsers)
+                                }
+                                .addOnFailureListener {
+                                    Log.e("Dashboard", "Error fetching user name", it)
+                                }
+                        }
                     }
+                } else {
+                    Log.d("Dashboard", "No chats found")
                 }
-            } else {
-                Log.d("Dashboard", "No chats found")
+                isLoading = false
+
             }
+        }
+        else{
             isLoading = false
         }
 
@@ -107,7 +123,12 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                     if (email.isNotEmpty()) {
                         isLoading = true
                         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                        viewModel.searchUserByEmail(db, email, navController!!, currentUserId)
+                        viewModel.searchUserByEmail(db, email, navController!!, currentUserId){ message ->
+                            isLoading = false
+                            if(message.isNotEmpty()){
+                                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
 
                     } else {
                         Toast.makeText(context, "Enter an email", Toast.LENGTH_SHORT).show()

@@ -8,6 +8,7 @@ import com.example.chattogether.db.UserDatabase
 import com.example.chattogether.db.entities.User
 import com.example.chattogether.db.repo.UserRepository
 import com.example.chattogether.utils.AppSession
+import com.example.chattogether.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -58,6 +59,7 @@ class ProfileViewModel(application: Application): AndroidViewModel(application) 
     }
 
     fun logout() {
+        AppSession.remove(Constant.USERS_LIST)
         auth.signOut()
     }
 

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.google.gson.Gson
 import java.io.File
 
 object AppSession {
@@ -52,10 +53,10 @@ object AppSession {
         editor.clear().commit()
     }
 
-//    fun putObject(key: String?, obj: Any?) {
-//        val gson = Gson()
-//        putString(key, gson.toJson(obj))
-//    }
+    fun putObject(key: String?, obj: Any?) {
+        val gson = Gson()
+        putString(key, gson.toJson(obj))
+    }
 
     fun putString(key: String?, value: String?) {
         sharedPref.edit().putString(key, value).apply()
@@ -69,10 +70,10 @@ object AppSession {
         return sharedPref.getInt(key, 0)
     }
 
-//    fun getObject(key: String?, classOfT: Class<*>?): Any? {
-//        val json = getString(key!!)
-//        return Gson().fromJson(json, classOfT)
-//    }
+    fun getObject(key: String?, classOfT: Class<*>?): Any? {
+        val json = getString(key!!)
+        return Gson().fromJson(json, classOfT)
+    }
 
     fun remove(key: String) {
         editor.remove(key).commit()

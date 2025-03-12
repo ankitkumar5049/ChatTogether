@@ -38,7 +38,8 @@ class DashboardViewModel: ViewModel() {
         db: FirebaseFirestore,
         email: String,
         navController: NavController,
-        currentUserId: String
+        currentUserId: String,
+        onComplete: (String) -> Unit
     ) {
         db.collection("users")
             .whereEqualTo("email", email)
@@ -55,14 +56,17 @@ class DashboardViewModel: ViewModel() {
                             .replace("{otherUserId}", otherUserId)
 
                         navController.navigate(chatRoute)
+                        onComplete("")
                         return@addOnSuccessListener
                     }
                 } else {
                     println("No user found")
+                    onComplete("No User Found!")
                 }
             }
             .addOnFailureListener { exception ->
                 println("Error getting user: ${exception.message}")
+                onComplete("Unexpected Error!")
             }
     }
 
