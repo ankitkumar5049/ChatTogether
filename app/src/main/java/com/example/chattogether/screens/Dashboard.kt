@@ -115,13 +115,16 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                 },
                 enabled = !isLoading
             ) {
-                Text(text = if (isLoading) "Searching..." else "Search")
+                Text(text ="Search")
             }
         }
 
 
         if (isLoading) {
-            CircularProgressIndicator()
+            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+                CircularProgressIndicator()
+            }
+
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(chatUsers) { (userId, userName) ->
@@ -164,7 +167,9 @@ fun ChatListItem(userName: String, onClick: () -> Unit) {
                     imageVector = Icons.Default.Person,
                     contentDescription = "Person",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp).align(Alignment.Center)
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.Center)
                 )
             }
 
