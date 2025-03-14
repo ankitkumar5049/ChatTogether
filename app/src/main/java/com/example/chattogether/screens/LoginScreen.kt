@@ -54,14 +54,14 @@ fun LoginScreen(navController: NavController?,
                 onSignUpClick: () -> Unit) {
 
 
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var loginText by remember { mutableStateOf("Login Screen") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        email = AppSession.getString("email")?:""
+        username = AppSession.getString("username")?:""
         password = AppSession.getString("password")?:""
     }
 
@@ -86,10 +86,10 @@ fun LoginScreen(navController: NavController?,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp),
-            value = email,
-            onValueChange = { email = it },
+            value = username,
+            onValueChange = { username = it },
             singleLine = true,
-            label = { Text("Email") }
+            label = { Text("Username") }
         )
 
         OutlinedTextField(
@@ -111,7 +111,7 @@ fun LoginScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
-                viewModel.login(email, password) { success ->
+                viewModel.login(username, password) { success ->
                     if (success) {
                         onLoginSuccess()  // Navigate to Dashboard
                     } else {

@@ -4,19 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.chattogether.navigation.Screen
+import com.example.chattogether.utils.Constant
 import com.google.firebase.firestore.FirebaseFirestore
 
 class DashboardViewModel: ViewModel() {
     fun getUserChats(db: FirebaseFirestore, userId: String, onResult: (List<Map<String, Any>>) -> Unit) {
         val chatRooms = mutableListOf<Map<String, Any>>()
 
-        db.collection("chats")
+        db.collection(Constant.CHATS)
             .whereEqualTo("user1", userId)
             .get()
             .addOnSuccessListener { querySnapshot1 ->
                 querySnapshot1.documents.mapNotNullTo(chatRooms) { it.data }
 
-                db.collection("chats")
+                db.collection(Constant.CHATS)
                     .whereEqualTo("user2", userId)
                     .get()
                     .addOnSuccessListener { querySnapshot2 ->
@@ -36,13 +37,17 @@ class DashboardViewModel: ViewModel() {
 
     fun searchUserByEmail(
         db: FirebaseFirestore,
-        email: String,
+        username_: String,
         navController: NavController,
         currentUserId: String,
         onComplete: (String) -> Unit
     ) {
-        db.collection("users")
-            .whereEqualTo("email", email)
+        var username = username_
+        if(username_.takeLast(4)!=".com") {
+            username = username_ + Constant.MAIL_EXTENSION
+        }
+        db.collection(Constant.USERS)
+            .whereEqualTo("username", username)
             .get()
             .addOnSuccessListener { documents ->
                 if (!documents.isEmpty) {

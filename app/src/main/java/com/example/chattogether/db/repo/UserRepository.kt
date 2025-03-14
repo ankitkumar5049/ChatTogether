@@ -13,9 +13,15 @@ class UserRepository(private val userDao: UserDao) {
         }
     }
 
-    suspend fun getUserByEmail(email: String): User? {
+    suspend fun getUserByUsername(username: String): User? {
         return withContext(Dispatchers.IO) {
-            userDao.getUserByEmail(email)
+            userDao.getUserByUsername(username)
+        }
+    }
+
+    suspend fun getUserByUserId(userId: String): User? {
+        return withContext(Dispatchers.IO) {
+            userDao.getUserByUserId(userId)
         }
     }
 }

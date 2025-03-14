@@ -37,31 +37,33 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.chattogether.R
 import com.example.chattogether.utils.AppSession
+import com.example.chattogether.utils.Constant
 import com.example.chattogether.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick: () -> Unit) {
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    email = AppSession.getString("email")!!
+    var dob by remember { mutableStateOf("") }
+    username = AppSession.getString(Constant.USERNAME)!!
+
+    val User =
 
     LaunchedEffect(Unit) {
         profileViewModel.getUserDetails(){ user ->
-            email = user!!.email
+            username = user!!.username
             name = user.name
-            phone = user.phone
+            dob = user.dob
+            if(username.takeLast(4)==".com"){
+                username.substring(0, username.length-13)
+            }
         }
     }
 
-//    val gradientBrush = Brush.verticalGradient(
-//        colors = listOf(Color(0xFF3F51B5), Color(0xFF536DFE)) // Gradient for background
-//    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-//            .background(gradientBrush) // Background gradient
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -97,8 +99,8 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 ProfileItem(label = "Name", value = name)
-                ProfileItem(label = "Email", value = email)
-                ProfileItem(label = "Phone", value = phone)
+                ProfileItem(label = "Username", value = username)
+                ProfileItem(label = "D.O.B", value = dob)
             }
         }
 

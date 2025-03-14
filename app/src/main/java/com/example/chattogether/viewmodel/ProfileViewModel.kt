@@ -29,14 +29,15 @@ class ProfileViewModel(application: Application): AndroidViewModel(application) 
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val name = document.getString("name") ?: ""
-                    val email = document.getString("email") ?: ""
-                    val phone = document.getString("phone") ?: ""
+                    val username = document.getString("username") ?: ""
+                    val dob = document.getString("dob") ?: ""
                     val password = document.getString("password") ?: "" // If you saved password (not recommended for security reasons)
 
                     val user = User(
+                        userId=userId,
                         name = name,
-                        email = email,
-                        phone = phone,
+                        username = username,
+                        dob = dob,
                         password = password
                     )
                     onResult(user)
@@ -51,9 +52,9 @@ class ProfileViewModel(application: Application): AndroidViewModel(application) 
     }
 
 
-    fun getUserByEmail(email: String, onResult: (User?) -> Unit) {
+    fun getUserByUsername(username: String, onResult: (User?) -> Unit) {
         viewModelScope.launch {
-            val user = repository.getUserByEmail(email)
+            val user = repository.getUserByUsername(username)
             onResult(user)
         }
     }

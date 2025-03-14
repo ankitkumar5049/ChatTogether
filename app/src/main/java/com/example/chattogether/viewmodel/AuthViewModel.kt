@@ -10,6 +10,7 @@ import com.example.chattogether.db.UserDatabase
 import com.example.chattogether.db.entities.User
 import com.example.chattogether.db.repo.UserRepository
 import com.example.chattogether.utils.AppSession
+import com.example.chattogether.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -22,11 +23,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = UserRepository(userDao)
 
     // Sign up with Name, Phone, and Password
-    fun signUp(name: String, email: String, phone: String, password: String, onResult: (Boolean, String) -> Unit) {
-        AppSession.putString("email", email)
-        AppSession.putString("password", password)
+    fun signUp(name: String, username_: String, dob: String, password: String, onResult: (Boolean, String) -> Unit) {
+        AppSession.putString(Constant.USERNAME, username_)
+        AppSession.putString(Constant.PASSWORD, password)
         viewModelScope.launch {
-            auth.createUserWithEmailAndPassword(email, password)
+            var username = username_
+            if(username_.takeLast(4)!=".com") {
+                username = username_ + Constant.MAIL_EXTENSION
+            }
+            auth.createUserWithEmailAndPassword(username, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: ""
@@ -34,26 +39,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                         val user = hashMapOf(
                             "user_id" to userId,
                             "name" to name,
-                            "email" to email,
-                            "phone" to phone
+                            "username" to username,
+                            "dob" to dob
                         )
 
 
                         // Save user details in Firestore
-                        db.collection("users").document(userId).set(user)
+                        db.collection(Constant.USERS).document(userId).set(user)
                             .addOnSuccessListener {
                                 onResult(true, "Sign-up successful!")
                                 insertUser(
-                                    User(name = name, email = email, password = password, phone = phone)
+                                    User(userId = userId, name = name, username = username, password = password, dob = dob)
                                 )
-
-//                                getUserByEmail(email) { fetchedUser ->
-//                                    if (fetchedUser != null) {
-//                                        Log.d("TAG", "signUp: $fetchedUser")
-//                                    } else {
-//                                        Log.d("TAG", "signUp: user not found")
-//                                    }
-//                                }
                             }
                             .addOnFailureListener { e ->
                                 onResult(false, "Failed to save user: ${e.message}")
@@ -66,10 +63,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Login with Phone and Password
-    fun login(email: String, password: String, onResult: (Boolean) -> Unit) {
-        AppSession.putString("email", email)
-        AppSession.putString("password", password)
-        auth.signInWithEmailAndPassword(email, password)
+    fun login(username_: String, password: String, onResult: (Boolean) -> Unit) {
+        AppSession.putString(Constant.USERNAME, username_)
+        AppSession.putString(Constant.PASSWORD, password)
+        var username = username_
+        if(username_.takeLast(4)!=".com") {
+            username = username_ + Constant.MAIL_EXTENSION
+        }
+        auth.signInWithEmailAndPassword(username, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     onResult(true)  // Success, navigate to Dashboard
@@ -92,7 +93,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         auth.signOut()
     }
 
-    fun insertUser(user: User) {
+    private fun insertUser(user: User) {
         viewModelScope.launch {
             try {
                 repository.insertUser(user)

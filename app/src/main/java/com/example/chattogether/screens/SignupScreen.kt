@@ -1,12 +1,15 @@
 package com.example.chattogether.screens
 
+import android.app.DatePickerDialog
 import android.content.Context
+import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +52,7 @@ import com.example.chattogether.viewmodel.AuthViewModel
 import com.example.chattogether.navigation.Screen
 import com.example.chattogether.utils.AppSession
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @Composable
 fun SignUpScreen(navController: NavController?,
@@ -56,13 +60,27 @@ fun SignUpScreen(navController: NavController?,
                  onLoginClick: () -> Unit) {
 
     var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+    var dob by remember { mutableStateOf("") }
     var loginText by remember { mutableStateOf("SignUp Screen") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    val datePickerDialog = remember {
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val selectedDate = "$dayOfMonth/${month + 1}/$year"
+                dob = selectedDate
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+    }
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -95,21 +113,39 @@ fun SignUpScreen(navController: NavController?,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 15.dp, end = 15.dp),
-            value = email,
-            onValueChange = { email = it },
+            value = username,
+            onValueChange = { username = it },
             singleLine = true,
-            label = { Text("Email") }
+            label = { Text("Username") }
         )
 
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 15.dp, end = 15.dp),
-            value = phone,
-            onValueChange = { phone = it },
+                .padding(start = 15.dp, end = 15.dp)
+                .clickable { datePickerDialog.show() }, // Show DatePickerDialog on click
+            value = dob,
+            onValueChange = {},
             singleLine = true,
-            label = { Text("Phone") }
+            label = { Text("DOB") },
+            readOnly = true // Make it non-editable
         )
+
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(horizontal = 15.dp)
+//                .clickable { datePickerDialog.show() } // Clickable Box opens DatePicker
+//        ) {
+//            OutlinedTextField(
+//                value = dob,
+//                onValueChange = {},
+//                singleLine = true,
+//                label = { Text("DOB") },
+//                readOnly = true, // Non-editable
+//                modifier = Modifier.fillMaxWidth()
+//            )
+//        }
 
         OutlinedTextField(
             modifier = Modifier
@@ -142,11 +178,10 @@ fun SignUpScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
-                AppSession.putString("email", email)
                 authSetup(viewModel,
                 name,
-                email,
-                phone,
+                username,
+                dob,
                 password,
                 confirmPassword,
                 context){

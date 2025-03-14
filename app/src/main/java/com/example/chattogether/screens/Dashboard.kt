@@ -38,7 +38,7 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val currentUserId = auth.currentUser?.uid ?: ""
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
 
     var chatUsers by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) } // (UserId, Name)
     var isLoading by remember { mutableStateOf(true) }
@@ -106,9 +106,9 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Enter email to search") },
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Enter username to search") },
                 keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                 modifier = Modifier
                     .weight(1f)
@@ -120,10 +120,10 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
             Button(
                 modifier = Modifier.width(100.dp),
                 onClick = {
-                    if (email.isNotEmpty()) {
+                    if (username.isNotEmpty()) {
                         isLoading = true
                         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-                        viewModel.searchUserByEmail(db, email, navController!!, currentUserId){ message ->
+                        viewModel.searchUserByEmail(db, username, navController!!, currentUserId){ message ->
                             isLoading = false
                             if(message.isNotEmpty()){
                                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
@@ -131,7 +131,7 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                         }
 
                     } else {
-                        Toast.makeText(context, "Enter an email", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Enter an username", Toast.LENGTH_SHORT).show()
                     }
                 },
                 enabled = !isLoading
