@@ -1,5 +1,6 @@
 package com.example.chattogether.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,17 +47,17 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
     var username by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-    username = AppSession.getString(Constant.USERNAME)!!
 
-    val User =
 
     LaunchedEffect(Unit) {
         profileViewModel.getUserDetails(){ user ->
-            username = user!!.username
-            name = user.name
-            dob = user.dob
-            if(username.takeLast(4)==".com"){
-                username.substring(0, username.length-13)
+            if(user!=null) {
+                username = user.username
+                name = user.name
+                dob = user.dob
+//                if (username.takeLast(4) == ".com") {
+//                    username.substring(0, username.length - 13)
+//                }
             }
         }
     }
@@ -71,21 +73,15 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
         Spacer(modifier = Modifier.height(50.dp))
 
         // Profile Image
-        Box(
+        Image(
+            painter = painterResource(id = R.drawable.app_logo),
+            contentDescription = "Profile Image",
             modifier = Modifier
                 .size(100.dp)
-                .clip(CircleShape)
-                .border(4.dp, Color.White, CircleShape)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "Profile Image",
-                tint = Color.White,
-                modifier = Modifier
-                    .size(60.dp)
-                    .align(Alignment.Center)
-            )
-        }
+                .clip(CircleShape) // Makes it round
+                .border(2.dp, Color.White, CircleShape), // Optional border
+            contentScale = ContentScale.Crop // Ensures image fills the circle
+        )
 
         Spacer(modifier = Modifier.height(20.dp))
 

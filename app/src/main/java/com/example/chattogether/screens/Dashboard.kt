@@ -44,10 +44,10 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
     var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(Unit) {
-        val json = AppSession.getString(Constant.USERS_LIST)
-        val type = object : TypeToken<List<Pair<String, String>>>() {}.type
-        chatUsers = Gson().fromJson(json, type)?: emptyList()
-
+        viewModel.getChatUsersFromLocal(currentUserId) { localChats ->
+            chatUsers = localChats.map { it.userId to it.userName }
+            Log.d("TAG", "Dashboard chat user: $chatUsers")
+        }
 
         if(chatUsers.isEmpty()){
             viewModel.getUserChats(db, currentUserId) { chatRooms ->
@@ -65,7 +65,7 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                                     val userName = document.getString("name") ?: "Unknown User"
                                     usersList.add(otherUserId to userName)
                                     chatUsers = usersList.toList()
-                                    AppSession.putObject(Constant.USERS_LIST, chatUsers)
+                                    viewModel.saveChatUsersToLocal(currentUserId, chatUsers)
                                 }
                                 .addOnFailureListener {
                                     Log.e("Dashboard", "Error fetching user name", it)

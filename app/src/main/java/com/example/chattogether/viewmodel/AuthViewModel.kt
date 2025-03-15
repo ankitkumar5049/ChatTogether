@@ -1,21 +1,17 @@
 package com.example.chattogether.viewmodel
 
 import android.app.Application
-import android.content.Context
-import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.chattogether.base.BaseViewModel
 import com.example.chattogether.db.UserDatabase
 import com.example.chattogether.db.entities.User
 import com.example.chattogether.db.repo.UserRepository
-import com.example.chattogether.utils.AppSession
 import com.example.chattogether.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
+class AuthViewModel(application: Application) : BaseViewModel(application) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -24,8 +20,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // Sign up with Name, Phone, and Password
     fun signUp(name: String, username_: String, dob: String, password: String, onResult: (Boolean, String) -> Unit) {
-        AppSession.putString(Constant.USERNAME, username_)
-        AppSession.putString(Constant.PASSWORD, password)
         viewModelScope.launch {
             var username = username_
             if(username_.takeLast(4)!=".com") {
@@ -35,14 +29,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         val userId = auth.currentUser?.uid ?: ""
-                        AppSession.putString("userId", userId)
                         val user = hashMapOf(
                             "user_id" to userId,
                             "name" to name,
                             "username" to username,
                             "dob" to dob
                         )
-
 
                         // Save user details in Firestore
                         db.collection(Constant.USERS).document(userId).set(user)
@@ -64,8 +56,6 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     // Login with Phone and Password
     fun login(username_: String, password: String, onResult: (Boolean) -> Unit) {
-        AppSession.putString(Constant.USERNAME, username_)
-        AppSession.putString(Constant.PASSWORD, password)
         var username = username_
         if(username_.takeLast(4)!=".com") {
             username = username_ + Constant.MAIL_EXTENSION
@@ -80,27 +70,13 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             }
     }
 
-    fun checkValidation(name: String, phone: String, password: String, email: String, confirmPassword: String): Boolean{
-        return !(name.isEmpty() || phone.isEmpty() || password.isEmpty()|| confirmPassword.isEmpty() || confirmPassword!=password)
+    fun checkValidation(name: String, dob: String, password: String, username: String, confirmPassword: String): Boolean{
+        return !(name.trim().isEmpty() || dob.trim().isEmpty() || password.trim().isEmpty()|| username.trim().isEmpty()||confirmPassword.isEmpty() || confirmPassword!=password)
     }
 
-    fun checkValidation(id: String, password: String): Boolean{
-        return !(id.isEmpty() || password.isEmpty())
+    fun checkValidation(username: String, password: String): Boolean{
+        return !(username.trim().isEmpty() || password.trim().isEmpty())
     }
 
-    // Logout
-    fun logout() {
-        auth.signOut()
-    }
-
-    private fun insertUser(user: User) {
-        viewModelScope.launch {
-            try {
-                repository.insertUser(user)
-            } catch (e: Exception) {
-                Log.d("TAG", "insertUser: unable to save")
-            }
-        }
-    }
 
 }

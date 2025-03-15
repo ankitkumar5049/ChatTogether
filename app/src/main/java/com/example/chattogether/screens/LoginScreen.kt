@@ -32,19 +32,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.R
-import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.AuthViewModel
 
 @Composable
@@ -55,14 +50,17 @@ fun LoginScreen(navController: NavController?,
 
 
     var username by remember { mutableStateOf("") }
-    var loginText by remember { mutableStateOf("Login Screen") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        username = AppSession.getString("username")?:""
-        password = AppSession.getString("password")?:""
+        viewModel.getSavedUserDetails { user ->
+            if(user!=null){
+                username = user.username
+                password = user.password
+            }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize(),
@@ -111,13 +109,19 @@ fun LoginScreen(navController: NavController?,
             .fillMaxWidth()
             .padding(15.dp)
             ,onClick = {
-                viewModel.login(username, password) { success ->
-                    if (success) {
-                        onLoginSuccess()  // Navigate to Dashboard
-                    } else {
-                        Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+                if(viewModel.checkValidation(username, password)){
+                    viewModel.login(username, password) { success ->
+                        if (success) {
+                            onLoginSuccess()  // Navigate to Dashboard
+                        } else {
+                            Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
+                else{
+                    Toast.makeText(context, "Please fill all the details", Toast.LENGTH_SHORT).show()
+                }
+
             },
             colors = ButtonDefaults.buttonColors(containerColor = buttonColor))
         {

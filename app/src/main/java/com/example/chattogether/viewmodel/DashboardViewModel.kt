@@ -1,13 +1,22 @@
 package com.example.chattogether.viewmodel
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.chattogether.base.BaseViewModel
+import com.example.chattogether.db.UserDatabase
+import com.example.chattogether.db.entities.ChatUserEntity
+import com.example.chattogether.db.repo.ChatUserRepository
 import com.example.chattogether.navigation.Screen
 import com.example.chattogether.utils.Constant
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 
-class DashboardViewModel: ViewModel() {
+class DashboardViewModel(application: Application): BaseViewModel(application) {
+
+    private val chatUserDao = UserDatabase.getDatabase(application).chatUserDao()
+    private val repository = ChatUserRepository(chatUserDao)
     fun getUserChats(db: FirebaseFirestore, userId: String, onResult: (List<Map<String, Any>>) -> Unit) {
         val chatRooms = mutableListOf<Map<String, Any>>()
 
@@ -74,5 +83,24 @@ class DashboardViewModel: ViewModel() {
                 onComplete("Unexpected Error!")
             }
     }
+
+    fun saveChatUsersToLocal(uid: String, chatUsers: List<Pair<String, String>>) {
+        viewModelScope.launch {
+            // Clear old data for this user
+            repository.deleteChatUsers(uid)
+
+            // Insert new data
+            val chatUserEntities = chatUsers.map { ChatUserEntity(it.first, it.second, uid) }
+            repository.insertChatUsers(chatUserEntities)
+        }
+    }
+
+    fun getChatUsersFromLocal(uid: String, onResult: (List<ChatUserEntity>) -> Unit) {
+        viewModelScope.launch {
+            val users = repository.getChatUsers(uid)
+            onResult(users)
+        }
+    }
+
 
 }
