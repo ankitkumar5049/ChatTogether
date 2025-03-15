@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -49,6 +51,7 @@ import coil.compose.AsyncImage
 import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.ChatViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.foundation.lazy.items
 
 @Composable
 fun ChatScreen(navController: NavController?, userId: String, otherUserId: String, viewModel: ChatViewModel = viewModel()) {
@@ -60,6 +63,7 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
     var otherUserName by remember { mutableStateOf(otherUserId) }
     var selectedFileUri by remember { mutableStateOf<String?>(null) }
     var fileType by remember { mutableStateOf<String?>(null) }
+    val listState = rememberLazyListState()
 
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -70,6 +74,10 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
                 viewModel.sendMessage(db, chatId!!, userId, otherUserId, null, downloadUrl, fileType)
             }
         }
+    }
+
+    LaunchedEffect(messages) {
+        listState.animateScrollToItem(0)
     }
 
     LaunchedEffect(otherUserId) {
@@ -113,17 +121,17 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
             modifier = Modifier.padding(bottom = 10.dp)
         )
 
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+        LazyColumn(
+            state = listState,
+            reverseLayout = true, // Ensures the latest message appears at the bottom
+            modifier = Modifier.weight(1f)
         ) {
-            messages.forEach { msg ->
+            items(messages.reversed()) { msg -> // Reverse to maintain order
                 val senderId = msg["senderId"] as? String ?: ""
                 val text = msg["message"] as? String
                 val fileUrl = msg["fileUrl"] as? String
                 val type = msg["fileType"] as? String
-                val time = msg["formattedTime"] as? String?: ""
+                val time = msg["formattedTime"] as? String ?: ""
                 ChatBubble(text, fileUrl, type, senderId == userId, time)
             }
         }
