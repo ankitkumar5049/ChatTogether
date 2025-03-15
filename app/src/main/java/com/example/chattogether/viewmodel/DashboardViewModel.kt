@@ -62,12 +62,21 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
                 if (!documents.isEmpty) {
                     for (document in documents) {
                         val otherUserId = document.id
-                        println("User found: $otherUserId")
+                        val otherUserName = document.getString("name") ?: "Unknown User"
 
                         // Navigate to ChatScreen with userId
                         val chatRoute = Screen.Chats.route
                             .replace("{currentUserId}", currentUserId)
                             .replace("{otherUserId}", otherUserId)
+
+                        getChatUsersFromLocal(currentUserId) { localChats ->
+                            val updatedChatUsers = localChats.map { it.userId to it.userName }.toMutableList()
+
+                            if (updatedChatUsers.none { it.first == otherUserId }) {
+                                updatedChatUsers.add(otherUserId to otherUserName)  // Add new user
+                                saveChatUsersToLocal(currentUserId, updatedChatUsers)
+                            }
+                        }
 
                         navController.navigate(chatRoute)
                         onComplete("")

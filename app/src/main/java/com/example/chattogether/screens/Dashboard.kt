@@ -42,48 +42,53 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
 
     var chatUsers by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) } // (UserId, Name)
     var isLoading by remember { mutableStateOf(true) }
+    var isLocalDataChecked by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.getChatUsersFromLocal(currentUserId) { localChats ->
             chatUsers = localChats.map { it.userId to it.userName }
+            isLocalDataChecked = true
             Log.d("TAG", "Dashboard chat user: $chatUsers")
         }
+    }
 
-        if(chatUsers.isEmpty()){
-            viewModel.getUserChats(db, currentUserId) { chatRooms ->
-                if (chatRooms.isNotEmpty()) {
-                    val usersList = mutableListOf<Pair<String, String>>()
+        LaunchedEffect(isLocalDataChecked) {
+            if (isLocalDataChecked && chatUsers.isEmpty()) {
+                viewModel.getUserChats(db, currentUserId) { chatRooms ->
+                    if (chatRooms.isNotEmpty()) {
+                        val usersList = mutableListOf<Pair<String, String>>()
 
-                    chatRooms.forEach { chat ->
-                        val user1 = chat["user1"] as? String
-                        val user2 = chat["user2"] as? String
-                        val otherUserId = if (user1 == currentUserId) user2 else user1
+                        chatRooms.forEach { chat ->
+                            val user1 = chat["user1"] as? String
+                            val user2 = chat["user2"] as? String
+                            val otherUserId = if (user1 == currentUserId) user2 else user1
 
-                        if (!otherUserId.isNullOrBlank()) {
-                            db.collection("users").document(otherUserId).get()
-                                .addOnSuccessListener { document ->
-                                    val userName = document.getString("name") ?: "Unknown User"
-                                    usersList.add(otherUserId to userName)
-                                    chatUsers = usersList.toList()
-                                    viewModel.saveChatUsersToLocal(currentUserId, chatUsers)
-                                }
-                                .addOnFailureListener {
-                                    Log.e("Dashboard", "Error fetching user name", it)
-                                }
+                            if (!otherUserId.isNullOrBlank()) {
+                                db.collection("users").document(otherUserId).get()
+                                    .addOnSuccessListener { document ->
+                                        val userName = document.getString("name") ?: "Unknown User"
+                                        usersList.add(otherUserId to userName)
+
+                                        // Update chat users and cache them locally
+                                        chatUsers = usersList.toList()
+                                        viewModel.saveChatUsersToLocal(currentUserId, chatUsers)
+
+                                        Log.d("TAG", "Fetched from Firebase: $chatUsers")
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("Dashboard", "Error fetching user name", it)
+                                    }
+                            }
                         }
+                    } else {
+                        Log.d("Dashboard", "No chats found")
                     }
-                } else {
-                    Log.d("Dashboard", "No chats found")
+                    isLoading = false
                 }
+            } else {
                 isLoading = false
-
             }
         }
-        else{
-            isLoading = false
-        }
-
-    }
 
     Column(
         modifier = Modifier
