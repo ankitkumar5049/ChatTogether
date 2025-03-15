@@ -6,8 +6,10 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -61,19 +63,34 @@ fun SignUpScreen(navController: NavController?,
     var username by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-    var loginText by remember { mutableStateOf("SignUp Screen") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordVisible1 by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val interactionSource = remember { MutableInteractionSource() }
     val calendar = Calendar.getInstance()
 
     val datePickerDialog = remember {
         DatePickerDialog(
             context,
             { _, year, month, dayOfMonth ->
-                val selectedDate = "$dayOfMonth/${month + 1}/$year"
-                dob = selectedDate
+                val selectedCalendar = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+
+                val today = Calendar.getInstance()
+                val age = today.get(Calendar.YEAR) - selectedCalendar.get(Calendar.YEAR)
+
+                // Check if user is 16 or older
+                if (age > 16 || (age == 16 &&
+                            (today.get(Calendar.MONTH) > selectedCalendar.get(Calendar.MONTH) ||
+                                    (today.get(Calendar.MONTH) == selectedCalendar.get(Calendar.MONTH) &&
+                                            today.get(Calendar.DAY_OF_MONTH) >= selectedCalendar.get(Calendar.DAY_OF_MONTH))))) {
+
+                    dob = "$dayOfMonth/${month + 1}/$year"
+                } else {
+                    Toast.makeText(context, "You must be at least 16 years old", Toast.LENGTH_SHORT).show()
+                }
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -118,17 +135,27 @@ fun SignUpScreen(navController: NavController?,
             label = { Text("Username") }
         )
 
-        OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 15.dp, end = 15.dp)
-                .clickable { datePickerDialog.show() }, // Show DatePickerDialog on click
-            value = dob,
-            onValueChange = {},
-            singleLine = true,
-            label = { Text("DOB") },
-            readOnly = true // Make it non-editable
-        )
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 15.dp, end = 15.dp)) {
+
+            OutlinedTextField(
+                value = dob,
+                onValueChange = { dob = it },
+                singleLine = true,
+                label = { Text("DOB") },
+                readOnly = true, // Prevents editing
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Transparent clickable overlay
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { datePickerDialog.show() }
+            )
+        }
+
 
 //        Box(
 //            modifier = Modifier
@@ -225,6 +252,7 @@ fun SignUpScreen(navController: NavController?,
 
 fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: String, password: String,
               confirmPassword: String, context: Context, onSuccess: () -> Unit) {
+
     if (viewModel.checkValidation(name, phone, password, email, confirmPassword)) {
         viewModel.signUp(name.trim(), email.trim(), phone.trim(), password.trim()) { isSuccess, message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
