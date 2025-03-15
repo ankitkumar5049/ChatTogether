@@ -110,7 +110,7 @@ fun LoginScreen(navController: NavController?,
             .padding(15.dp)
             ,onClick = {
                 if(viewModel.checkValidation(username, password)){
-                    viewModel.login(username, password) { success ->
+                    viewModel.login(username.trim(), password.trim()) { success ->
                         if (success) {
                             onLoginSuccess()  // Navigate to Dashboard
                         } else {

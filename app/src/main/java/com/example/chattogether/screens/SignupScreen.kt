@@ -2,14 +2,12 @@ package com.example.chattogether.screens
 
 import android.app.DatePickerDialog
 import android.content.Context
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,22 +33,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.R
-import com.example.chattogether.utils.UserPreferences
-import com.example.chattogether.viewmodel.AuthViewModel
 import com.example.chattogether.navigation.Screen
-import com.example.chattogether.utils.AppSession
+import com.example.chattogether.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -210,15 +203,13 @@ fun SignUpScreen(navController: NavController?,
 
 fun authSetup(viewModel: AuthViewModel, name: String, email: String, phone: String, password: String,
               confirmPassword: String, context: Context, onSuccess: () -> Unit) {
-    val userPreferences = UserPreferences(context)
     if (viewModel.checkValidation(name, phone, password, email, confirmPassword)) {
-        viewModel.signUp(name, email, phone, password) { isSuccess, message ->
+        viewModel.signUp(name.trim(), email.trim(), phone.trim(), password.trim()) { isSuccess, message ->
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             if (isSuccess) {
                 viewModel.viewModelScope.launch {
-                    userPreferences.saveUserCredentials(email, password)
                     onSuccess() // Navigate to the main screen
-                } // Navigate if sign-up is successful
+                }
             }
         }
     } else {
