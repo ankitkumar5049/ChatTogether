@@ -10,6 +10,7 @@ import com.example.chattogether.utils.Constant
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class AuthViewModel(application: Application) : BaseViewModel(application) {
 
@@ -33,7 +34,9 @@ class AuthViewModel(application: Application) : BaseViewModel(application) {
                             "user_id" to userId,
                             "name" to name,
                             "username" to username,
-                            "dob" to dob
+                            "dob" to dob,
+                            "createdAt" to LocalDate.now().toString(),
+                            "userDeleted" to 0
                         )
 
                         // Save user details in Firestore

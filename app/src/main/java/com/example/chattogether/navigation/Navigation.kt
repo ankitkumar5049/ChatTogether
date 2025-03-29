@@ -12,10 +12,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.chattogether.screens.ChatScreen
 import com.example.chattogether.screens.Dashboard
 import com.example.chattogether.screens.HelpScreen
-import com.example.chattogether.screens.HomeScreen
 import com.example.chattogether.screens.LoginScreen
 import com.example.chattogether.screens.ProfileScreen
 import com.example.chattogether.screens.SignUpScreen
+import com.example.chattogether.screens.HomeScreen
 
 
 @Composable
