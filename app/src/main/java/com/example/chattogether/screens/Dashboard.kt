@@ -2,8 +2,10 @@ package com.example.chattogether.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -49,6 +51,13 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
             chatUsers = localChats.map { it.userId to it.userName }
             isLocalDataChecked = true
             Log.d("TAG", "Dashboard chat user: $chatUsers")
+        }
+    }
+
+    fun deleteChat(userId: String) {
+        viewModel.deleteChat(db, currentUserId, userId) {
+            chatUsers = chatUsers.filterNot { it.first == userId }
+            Toast.makeText(context, "Chat deleted", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -153,16 +162,20 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
 
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(chatUsers) { (userId, userName) ->
-                    ChatListItem(userName) {
-                        val chatRoute = Screen.Chats.route
-                            .replace("{currentUserId}", currentUserId)
-                            .replace("{otherUserId}", userId)
-
-                        navController?.navigate(chatRoute)
-                    }
+                items(chatUsers, key = { it.first }) { (userId, userName) ->
+                    ChatListItem(
+                        userName = userName,
+                        onClick = {
+                            val chatRoute = Screen.Chats.route
+                                .replace("{currentUserId}", currentUserId)
+                                .replace("{otherUserId}", userId)
+                            navController?.navigate(chatRoute)
+                        },
+                        onLongPress = { deleteChat(userId) }
+                    )
                 }
             }
+
         }
     }
 }
@@ -170,25 +183,51 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
 /**
  * Chat list item UI component.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ChatListItem(userName: String, onClick: () -> Unit) {
+fun ChatListItem(userName: String, onClick: () -> Unit, onLongPress: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Delete Chat") },
+            text = { Text("Are you sure you want to delete this chat?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onLongPress()
+                    showDialog = false
+                }) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable { onClick() },
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { showDialog = true }
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Placeholder for user avatar
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .background(MaterialTheme.colorScheme.primary, shape = CircleShape)
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Person",
@@ -198,13 +237,13 @@ fun ChatListItem(userName: String, onClick: () -> Unit) {
                         .align(Alignment.Center)
                 )
             }
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Text(text = userName, style = MaterialTheme.typography.bodyLarge)
         }
     }
 }
+
+
 
 
 

@@ -67,7 +67,6 @@ fun SignUpScreen(navController: NavController?,
     var passwordVisible by remember { mutableStateOf(false) }
     var passwordVisible1 by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val interactionSource = remember { MutableInteractionSource() }
     val calendar = Calendar.getInstance()
 
     val datePickerDialog = remember {
@@ -156,22 +155,6 @@ fun SignUpScreen(navController: NavController?,
             )
         }
 
-
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 15.dp)
-//                .clickable { datePickerDialog.show() } // Clickable Box opens DatePicker
-//        ) {
-//            OutlinedTextField(
-//                value = dob,
-//                onValueChange = {},
-//                singleLine = true,
-//                label = { Text("DOB") },
-//                readOnly = true, // Non-editable
-//                modifier = Modifier.fillMaxWidth()
-//            )
-//        }
 
         OutlinedTextField(
             modifier = Modifier

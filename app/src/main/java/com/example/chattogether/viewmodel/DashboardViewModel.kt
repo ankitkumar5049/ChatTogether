@@ -10,6 +10,7 @@ import com.example.chattogether.db.entities.ChatUserEntity
 import com.example.chattogether.db.repo.ChatUserRepository
 import com.example.chattogether.navigation.Screen
 import com.example.chattogether.utils.Constant
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
@@ -109,6 +110,20 @@ class DashboardViewModel(application: Application): BaseViewModel(application) {
             val users = repository.getChatUsers(uid)
             onResult(users)
         }
+    }
+
+    fun deleteChat(db: FirebaseFirestore, currentUserId: String, otherUserId: String, onComplete: () -> Unit) {
+        val chatRoomId = if (currentUserId < otherUserId) "$currentUserId$otherUserId" else "$otherUserId$currentUserId"
+
+        db.collection("chats").document(chatRoomId)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("DashboardViewModel", "Chat deleted successfully")
+                onComplete()
+            }
+            .addOnFailureListener { e ->
+                Log.e("DashboardViewModel", "Error deleting chat", e)
+            }
     }
 
 
