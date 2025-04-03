@@ -16,6 +16,7 @@ import com.example.chattogether.screens.LoginScreen
 import com.example.chattogether.screens.ProfileScreen
 import com.example.chattogether.screens.SignUpScreen
 import com.example.chattogether.screens.HomeScreen
+import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
@@ -25,6 +26,8 @@ fun Navigation() {
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val hideBottomBarRoutes = listOf(Screen.Login.route, Screen.SignUp.route)
+    val auth = FirebaseAuth.getInstance()
+    val startDestination = if (auth.currentUser != null) Screen.Main.route else Screen.Login.route
 
     Scaffold(
         bottomBar = {
@@ -34,7 +37,7 @@ fun Navigation() {
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = Screen.Login.route) {
+            NavHost(navController = navController, startDestination = startDestination) {
 
                 composable(route = Screen.Login.route) {
                     LoginScreen(
