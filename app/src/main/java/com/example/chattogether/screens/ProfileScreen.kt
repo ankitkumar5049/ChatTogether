@@ -1,11 +1,12 @@
 package com.example.chattogether.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,8 +18,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,15 +33,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.chattogether.R
-import com.example.chattogether.utils.AppSession
-import com.example.chattogether.utils.Constant
 import com.example.chattogether.viewmodel.ProfileViewModel
 
 @Composable
@@ -47,21 +49,18 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
     var username by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-
+    var isEditing by remember { mutableStateOf(false) }
+    var context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        profileViewModel.getUserDetails(){ user ->
-            if(user!=null) {
+        profileViewModel.getUserDetails { user ->
+            if (user != null) {
                 username = user.username
                 name = user.name
                 dob = user.dob
-//                if (username.takeLast(4) == ".com") {
-//                    username.substring(0, username.length - 13)
-//                }
             }
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -78,9 +77,9 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
             contentDescription = "Profile Image",
             modifier = Modifier
                 .size(100.dp)
-                .clip(CircleShape) // Makes it round
-                .border(2.dp, Color.White, CircleShape), // Optional border
-            contentScale = ContentScale.Crop // Ensures image fills the circle
+                .clip(CircleShape)
+                .border(2.dp, Color.White, CircleShape),
+            contentScale = ContentScale.Crop
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -94,33 +93,89 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
             elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                ProfileItem(label = "Name", value = name)
-                ProfileItem(label = "Username", value = username)
-                ProfileItem(label = "D.O.B", value = dob)
+                if (isEditing) {
+                    EditableProfileItem(label = "Name", value = name, onValueChange = { name = it })
+                    EditableProfileItem(label = "Username", value = username, onValueChange = { username = it })
+                    EditableProfileItem(label = "D.O.B", value = dob, onValueChange = { dob = it })
+                } else {
+                    ProfileItem(label = "Name", value = name)
+                    ProfileItem(label = "Username", value = username)
+                    ProfileItem(label = "D.O.B", value = dob)
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Column(modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-             verticalArrangement = Arrangement.Bottom) {
-            val buttonColor = if (isSystemInDarkTheme()) Color(0xFF448AFF) else Color(0xFF536DFE)
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp)
-                ,onClick = {
-                    onLoginClick()
-                    profileViewModel.logout()
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = buttonColor))
-            {
-                Text(text = "Logout")
+        // Edit / Save / Cancel Buttons
+        if (isEditing) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Button(
+                    onClick = {
+                        profileViewModel.updateUserInFirebase(name, username, dob){ success ->
+                            if(success){
+                                Toast.makeText(context, "Details Updated", Toast.LENGTH_SHORT).show()
+                            }
+                            else{
+                                Toast.makeText(context, "Error in updating", Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+                        isEditing = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                ) {
+                    Text(text = "Save")
+                }
+                Button(
+                    onClick = { isEditing = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                ) {
+                    Text(text = "Cancel")
+                }
+            }
+        } else {
+            Button(
+                onClick = { isEditing = true },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF448AFF))
+            ) {
+                Text(text = "Edit")
             }
         }
 
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // Logout Button
+        Button(
+            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+            onClick = {
+                onLoginClick()
+                profileViewModel.logout()
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE))
+        ) {
+            Text(text = "Logout")
+        }
     }
 }
+
+@Composable
+fun EditableProfileItem(label: String, value: String, onValueChange: (String) -> Unit) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Gray)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            textStyle = TextStyle(color = Color.Black, fontSize = 18.sp),
+            shape = MaterialTheme.shapes.medium
+        )
+    }
+}
+
+
 
 @Composable
 fun ProfileItem(label: String, value: String) {

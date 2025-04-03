@@ -24,4 +24,10 @@ class UserRepository(private val userDao: UserDao) {
             userDao.getUserByUserId(userId)
         }
     }
+
+    suspend fun updateUserDetails(userId: String, name: String, username: String, dob: String) {
+        withContext(Dispatchers.IO) {
+            userDao.updateUserDetails(userId, name, username, dob)
+        }
+    }
 }
