@@ -95,7 +95,7 @@ fun Navigation() {
                     })
                 }
                 composable(route = Screen.Help.route) {
-                    HelpScreen()
+                    HelpScreen(navController)
                 }
 
             }
