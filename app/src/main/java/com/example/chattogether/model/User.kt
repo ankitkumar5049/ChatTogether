@@ -5,5 +5,5 @@ data class User(
     val name: String = "",
     val email: String = "",
     val createdAt: String = "",
-    val userDeleted: String = "0"
+    val userDeleted: Int = 0
 )

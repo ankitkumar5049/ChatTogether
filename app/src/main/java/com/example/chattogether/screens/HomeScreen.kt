@@ -29,8 +29,11 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.chattogether.model.User
 import com.example.chattogether.viewmodel.HomeViewModel
@@ -70,7 +73,16 @@ fun HomeScreen(homeViewModel: HomeViewModel = viewModel()) {
 @Composable
 fun UserList(users: List<User>, modifier: Modifier = Modifier) {
     if(users.isEmpty()){
-        Text(text = "No users are there to connect")
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(text = "No users are there to connect",
+                textAlign = TextAlign.Center,
+                fontSize = 30.sp,
+                fontStyle = FontStyle.Normal)
+        }
     }
     else{
         LazyColumn(modifier = Modifier
