@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Screen(val route: String) {
@@ -14,6 +15,7 @@ sealed class Screen(val route: String) {
      object Profile: Screen("profile_screen")
      object Help: Screen("help_screen")
      object Home: Screen("home_screen")
+     object Setting: Screen("setting_screen")
      object Chats : Screen("chat_screen/{currentUserId}/{otherUserId}")
 }
 
@@ -22,6 +24,7 @@ sealed class BottomNavItem(val route: String, val title: String, val icon: Image
      object ChatsScreen : BottomNavItem("main_screen", "Chats", Icons.Default.Chat)
      object Profile : BottomNavItem("profile_screen", "Profile", Icons.Default.Person)
      object Help : BottomNavItem("help_screen", "Help", Icons.Default.Help)
+     object Setting : BottomNavItem("setting_screen", "Setting", Icons.Default.Settings)
 }
 
 

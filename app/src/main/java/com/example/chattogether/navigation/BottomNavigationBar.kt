@@ -14,7 +14,8 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem.Home,
         BottomNavItem.ChatsScreen,
         BottomNavItem.Profile,
-        BottomNavItem.Help
+//        BottomNavItem.Help,
+        BottomNavItem.Setting
     )
 
     NavigationBar {
@@ -36,20 +37,4 @@ fun BottomNavigationBar(navController: NavController) {
         }
     }
 
-//    Scaffold(
-//        bottomBar = { BottomNavigationBar(bottomNavController) }
-//    ) { paddingValues ->
-//        NavHost(
-//            navController = bottomNavController,
-//            startDestination = BottomNavItem.Home.route,
-//            modifier = Modifier.padding(paddingValues)
-//        ) {
-//            composable(BottomNavItem.Home.route) { HomeScreen() }
-//            composable(route = Screen.Main.route) {
-//                Dashboard(navController = navController)
-//            }
-//            composable(BottomNavItem.Profile.route) { ProfileScreen() }
-//            composable(BottomNavItem.Help.route) { HelpScreen() }
-//        }
-//    }
 }

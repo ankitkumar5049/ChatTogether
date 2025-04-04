@@ -145,17 +145,17 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Logout Button
-        Button(
-            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
-            onClick = {
-                onLoginClick()
-                profileViewModel.logout()
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE))
-        ) {
-            Text(text = "Logout")
-        }
+//        // Logout Button
+//        Button(
+//            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
+//            onClick = {
+//                onLoginClick()
+//                profileViewModel.logout()
+//            },
+//            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE))
+//        ) {
+//            Text(text = "Logout")
+//        }
     }
 }
 
