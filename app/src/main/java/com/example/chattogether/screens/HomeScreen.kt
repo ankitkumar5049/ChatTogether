@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,6 +42,7 @@ import com.example.chattogether.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(homeViewModel: HomeViewModel = viewModel()) {
     val users by homeViewModel.usersLiveData.observeAsState(emptyList())
+    val isLoading by homeViewModel.isLoading.observeAsState(initial = true)
 
     LaunchedEffect(Unit) {
         homeViewModel.fetchFirst20Users()
@@ -63,7 +65,18 @@ fun HomeScreen(homeViewModel: HomeViewModel = viewModel()) {
 
         Scaffold(
         ) { paddingValues ->
-            UserList(users, Modifier.padding(paddingValues))
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                UserList(users, Modifier.padding(paddingValues))
+            }
         }
     }
 

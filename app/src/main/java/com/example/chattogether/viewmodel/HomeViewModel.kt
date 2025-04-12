@@ -13,6 +13,9 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
     private val _usersLiveData = MutableLiveData<List<User>>()
     val usersLiveData: LiveData<List<User>> get() = _usersLiveData
 
+    private val _isLoading = MutableLiveData(true)
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     fun fetchFirst20Users() {
         db.collection("users")
             .limit(20)
@@ -20,6 +23,7 @@ class HomeViewModel(application: Application): BaseViewModel(application) {
             .addOnSuccessListener { snapshot ->
                 val users = snapshot.documents.mapNotNull { it.toObject(User::class.java) }
                 _usersLiveData.postValue(users)
+                _isLoading.postValue(false)
                 Log.d("DashboardViewModel", "Fetched ${users.size} users")
             }
             .addOnFailureListener { e ->
