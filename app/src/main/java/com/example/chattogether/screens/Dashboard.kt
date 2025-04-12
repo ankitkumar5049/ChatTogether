@@ -49,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.chattogether.components.LoaderOverlay
 import com.example.chattogether.navigation.Screen
 import com.example.chattogether.viewmodel.DashboardViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -142,6 +143,7 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            LoaderOverlay(isLoading = isLoading)
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it
@@ -185,12 +187,6 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
         }
 
 
-        if (isLoading) {
-            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                CircularProgressIndicator()
-            }
-
-        } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(filteredUsers, key = { it.first }) { (userId, userName) ->
                     ChatListItem(
@@ -206,7 +202,6 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
                 }
             }
 
-        }
     }
 }
 

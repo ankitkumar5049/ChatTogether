@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.components.ExpandableFAQItem
+import com.example.chattogether.navigation.Screen
 import com.example.chattogether.viewmodel.ProfileViewModel
 
 @Composable
@@ -56,7 +57,10 @@ fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
-            SettingsItem(title = "Edit Profile") { /* Navigate to Edit Profile */ }
+            SettingsItem(title = "Edit Profile") {
+                navController.navigate(Screen.Profile.route
+                    .replace("{isEditing}", true.toString()))
+            }
             SettingsItem(title = "Change Password") { /* Navigate to Change Password */ }
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 
 
 @Composable
@@ -95,13 +97,11 @@ fun Navigation() {
                 composable(route = Screen.Home.route) {
                     HomeScreen()
                 }
-                composable(route = Screen.Profile.route) {
-                    ProfileScreen(onLoginClick = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                            launchSingleTop = true
-                        }
-                    })
+                composable("profile_screen") {
+                    ProfileScreen(
+                        navController = navController,
+                        editing = false,
+                    )
                 }
                 composable(route = Screen.Help.route) {
                     HelpScreen(navController)
@@ -117,6 +117,17 @@ fun Navigation() {
                                 launchSingleTop = true
                             }
                         }
+                    )
+                }
+
+                composable(route = Screen.Profile.route,
+                    arguments = listOf(navArgument("isEditing") { type = NavType.BoolType })) {
+                        backStackEntry ->
+                    val isEditing = backStackEntry.arguments?.getBoolean("isEditing") ?: false
+
+                    ProfileScreen(
+                        navController = navController,
+                        editing = isEditing,
                     )
                 }
 

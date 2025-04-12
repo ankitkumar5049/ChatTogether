@@ -41,15 +41,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.chattogether.R
+import com.example.chattogether.components.LoaderOverlay
 import com.example.chattogether.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick: () -> Unit) {
+fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewModel = viewModel(), editing: Boolean) {
     var username by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
-    var isEditing by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(editing) }
+    var isLoading by remember {
+        mutableStateOf(false)
+    }
     var context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -59,6 +64,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
                 name = user.name
                 dob = user.dob
             }
+            isLoading = false
         }
     }
 
@@ -72,6 +78,7 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
         Spacer(modifier = Modifier.height(50.dp))
 
         // Profile Image
+        LoaderOverlay(isLoading = isLoading)
         Image(
             painter = painterResource(id = R.drawable.app_logo),
             contentDescription = "Profile Image",
@@ -107,7 +114,6 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Edit / Save / Cancel Buttons
         if (isEditing) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(
@@ -122,40 +128,23 @@ fun ProfileScreen(profileViewModel: ProfileViewModel = viewModel(), onLoginClick
 
                         }
                         isEditing = false
+                        navController.popBackStack()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                 ) {
                     Text(text = "Save")
                 }
                 Button(
-                    onClick = { isEditing = false },
+                    onClick = {
+                        isEditing = false
+                        navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                 ) {
                     Text(text = "Cancel")
                 }
             }
-        } else {
-            Button(
-                onClick = { isEditing = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF448AFF))
-            ) {
-                Text(text = "Edit")
-            }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-//        // Logout Button
-//        Button(
-//            modifier = Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp),
-//            onClick = {
-//                onLoginClick()
-//                profileViewModel.logout()
-//            },
-//            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF536DFE))
-//        ) {
-//            Text(text = "Logout")
-//        }
     }
 }
 
@@ -190,8 +179,3 @@ fun ProfileItem(label: String, value: String) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    ProfileScreen(onLoginClick = {})
-}

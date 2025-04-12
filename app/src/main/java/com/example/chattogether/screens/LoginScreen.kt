@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.R
+import com.example.chattogether.components.LoaderOverlay
 import com.example.chattogether.viewmodel.AuthViewModel
 
 @Composable
@@ -57,6 +58,7 @@ fun LoginScreen(navController: NavController?,
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
@@ -72,8 +74,9 @@ fun LoginScreen(navController: NavController?,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
 
+        LoaderOverlay(isLoading = isLoading)
 
-            Image(
+        Image(
                 painter = painterResource(id = R.drawable.app_logo),
                 contentDescription = "Profile Image",
                 modifier = Modifier
@@ -123,12 +126,14 @@ fun LoginScreen(navController: NavController?,
             .padding(15.dp)
             ,onClick = {
                 if(viewModel.checkValidation(username, password)){
+                    isLoading = true
                     viewModel.login(username.trim(), password.trim()) { success ->
                         if (success) {
                             onLoginSuccess()  // Navigate to Dashboard
                         } else {
                             Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
                         }
+                        isLoading = false
                     }
                 }
                 else{
