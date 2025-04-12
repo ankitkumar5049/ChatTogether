@@ -6,6 +6,7 @@ import com.example.chattogether.base.BaseViewModel
 import com.example.chattogether.db.UserDatabase
 import com.example.chattogether.db.repo.UserRepository
 import com.example.chattogether.model.User
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -54,6 +55,29 @@ class ProfileViewModel(application: Application): BaseViewModel(application) {
             }
             .addOnFailureListener { onComplete(false) }
     }
+
+    fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email ?: return onError("User not found")
+
+        val credential = EmailAuthProvider.getCredential(email, currentPassword)
+
+        user.reauthenticate(credential)
+            .addOnSuccessListener {
+                user.updatePassword(newPassword)
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onError(it.localizedMessage ?: "Error updating password") }
+            }
+            .addOnFailureListener {
+                onError("Current password is incorrect")
+            }
+    }
+
 
 
 }

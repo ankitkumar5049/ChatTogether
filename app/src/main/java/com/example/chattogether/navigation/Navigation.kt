@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.chattogether.screens.ChangePasswordScreen
 
 
 @Composable
@@ -130,6 +131,11 @@ fun Navigation() {
                         editing = isEditing,
                     )
                 }
+
+                composable(Screen.ChangePassword.route) {
+                    ChangePasswordScreen(navController)
+                }
+
 
             }
         }

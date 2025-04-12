@@ -20,6 +20,7 @@ sealed class Screen(val route: String) {
      object Home: Screen("home_screen")
      object Setting: Screen("setting_screen")
      object Chats : Screen("chat_screen/{currentUserId}/{otherUserId}")
+     object ChangePassword : Screen("change_password")
 }
 
 sealed class BottomNavItem(val route: String, val title: String, val icon: ImageVector) {

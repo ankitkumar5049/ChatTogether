@@ -61,7 +61,10 @@ fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
                 navController.navigate(Screen.Profile.route
                     .replace("{isEditing}", true.toString()))
             }
-            SettingsItem(title = "Change Password") { /* Navigate to Change Password */ }
+
+            SettingsItem(title = "Change Password") {
+                navController.navigate(Screen.ChangePassword.route)
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
