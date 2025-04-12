@@ -36,25 +36,6 @@ class ProfileViewModel(application: Application): BaseViewModel(application) {
     }
 
 
-    fun updateUserInFirebase(name: String, username: String, dob: String, onComplete: (Boolean) -> Unit) {
-        val userId = auth.currentUser?.uid ?: return
-
-        val updates = mapOf(
-            "name" to name,
-            "username" to username,
-            "dob" to dob
-        )
-
-        firestore.collection("users").document(userId)
-            .update(updates)
-            .addOnSuccessListener {
-                viewModelScope.launch {
-                    repository.updateUserDetails(userId, name, username, dob)
-                }
-                onComplete(true)
-            }
-            .addOnFailureListener { onComplete(false) }
-    }
 
     fun changePassword(
         currentPassword: String,

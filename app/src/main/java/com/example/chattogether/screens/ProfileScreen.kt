@@ -120,7 +120,15 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
                     onClick = {
                         profileViewModel.updateUserInFirebase(name, username, dob){ success ->
                             if(success){
+                                profileViewModel.getUserDetails { user ->
+                                    if (user != null) {
+                                        username = user.username
+                                        name = user.name
+                                        dob = user.dob
+                                    }
+                                }
                                 Toast.makeText(context, "Details Updated", Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
                             }
                             else{
                                 Toast.makeText(context, "Error in updating", Toast.LENGTH_SHORT).show()
@@ -128,7 +136,7 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
 
                         }
                         isEditing = false
-                        navController.popBackStack()
+
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                 ) {

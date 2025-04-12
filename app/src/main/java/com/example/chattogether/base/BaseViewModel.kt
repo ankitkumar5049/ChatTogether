@@ -17,6 +17,7 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
     private val userDao = UserDatabase.getDatabase(application).userDao()
     private val repository = UserRepository(userDao)
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
 
 
     fun insertUser(user: User) {
@@ -34,6 +35,26 @@ open class BaseViewModel(application: Application): AndroidViewModel(application
             val user = repository.getUserByUserId(auth.currentUser?.uid?:"")
             onResult(user)
         }
+    }
+
+    fun updateUserInFirebase(name: String, username: String, dob: String, onComplete: (Boolean) -> Unit) {
+        val userId = auth.currentUser?.uid ?: return
+
+        val updates = mapOf(
+            "name" to name,
+            "username" to username,
+            "dob" to dob
+        )
+
+        firestore.collection("users").document(userId)
+            .update(updates)
+            .addOnSuccessListener {
+                viewModelScope.launch {
+                    repository.updateUserDetails(userId, name, username, dob)
+                }
+                onComplete(true)
+            }
+            .addOnFailureListener { onComplete(false) }
     }
 
     fun getUserDetails( onResult: (User?) -> Unit) {
