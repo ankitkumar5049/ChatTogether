@@ -126,15 +126,14 @@ fun Dashboard(navController: NavController?, viewModel: DashboardViewModel = vie
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
         Text(text = "Chats",
             modifier = Modifier
                 .fillMaxWidth()
-                .align(Alignment.Start)
-                .padding(top = 15.dp),
+                .align(Alignment.Start),
             style = MaterialTheme.typography.headlineMedium
         )
 

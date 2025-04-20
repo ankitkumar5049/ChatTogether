@@ -52,6 +52,7 @@ import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.ChatViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.lazy.items
+import com.example.chattogether.utils.AESHelper
 
 @Composable
 fun ChatScreen(navController: NavController?, userId: String, otherUserId: String, viewModel: ChatViewModel = viewModel()) {
@@ -132,7 +133,8 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
                 val fileUrl = msg["fileUrl"] as? String
                 val type = msg["fileType"] as? String
                 val time = msg["formattedTime"] as? String ?: ""
-                ChatBubble(text, fileUrl, type, senderId == userId, time)
+                val decryptedMsg = AESHelper.decrypt(text!!)
+                ChatBubble(decryptedMsg, fileUrl, type, senderId == userId, time)
             }
         }
 
@@ -156,7 +158,7 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
 
             Button(onClick = {
                 if (message.text.isNotBlank() && chatId != null) {
-                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, message.text, null, null)
+                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, AESHelper.encrypt(message.text), null, null)
                     message = TextFieldValue("")
                 }
             }) {
