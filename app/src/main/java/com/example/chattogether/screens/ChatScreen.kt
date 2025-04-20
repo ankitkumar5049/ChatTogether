@@ -103,7 +103,7 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)
+            .padding(10.dp)
     ) {
         Text(
             text = "Chat Screen",
@@ -111,7 +111,7 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.Start)
-                .padding(top = 15.dp, bottom = 10.dp),
+                .padding(bottom = 10.dp),
         )
         Text(
             text = "Chatting with $otherUserName",

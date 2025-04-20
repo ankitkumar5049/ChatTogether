@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.firebase.storage.ktx)
     implementation(libs.play.services.fido)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.messaging.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

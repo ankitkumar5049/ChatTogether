@@ -1,5 +1,9 @@
 package com.example.chattogether.screens
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +37,7 @@ import androidx.navigation.NavController
 import com.example.chattogether.components.ExpandableFAQItem
 import com.example.chattogether.navigation.Screen
 import com.example.chattogether.viewmodel.ProfileViewModel
+import java.net.URLEncoder
 
 @Composable
 fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
@@ -40,6 +46,7 @@ fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
                    onLoginClick: () -> Unit) {
     var isDarkTheme by rememberSaveable { mutableStateOf(true) }
     var notificationsEnabled by remember { mutableStateOf(true) }
+    val context = LocalContext.current
 
     Scaffold(
 
@@ -48,7 +55,7 @@ fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
+                .padding(10.dp)
         ) {
             Text(
                 text = "Account Settings",
@@ -115,7 +122,21 @@ fun SettingsScreen(profileViewModel: ProfileViewModel = viewModel(),
                 question = "Why am I not receiving notifications?",
                 answer = "Ensure notifications are enabled in your device and app settings."
             )
-            SettingsItem(title = "Contact Us") { /* Navigate to Contact Page */ }
+
+            SettingsItem(title = "Contact Us") {
+                val phoneNumber = "+917903888878"
+                val message = "Hello, I want to contact you."
+
+                val url = "https://wa.me/${phoneNumber}?text=${URLEncoder.encode(message, "UTF-8")}"
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(url)
+
+                try {
+                    context.startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    Toast.makeText(context, "WhatsApp not installed", Toast.LENGTH_SHORT).show()
+                }
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 

@@ -55,7 +55,7 @@ fun ChangePasswordScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(10.dp)
                 .fillMaxSize(),
         ) {
             Text("Change Password", fontSize = 22.sp, fontWeight = FontWeight.Bold)
