@@ -158,7 +158,8 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
 
             Button(onClick = {
                 if (message.text.isNotBlank() && chatId != null) {
-                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, AESHelper.encrypt(message.text), null, null)
+                    val encryptText = AESHelper.encrypt(message.text)
+                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, encryptText, null, null)
                     message = TextFieldValue("")
                 }
             }) {
