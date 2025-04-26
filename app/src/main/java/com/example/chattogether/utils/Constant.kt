@@ -11,6 +11,7 @@ object Constant {
     const val CHATS = "chats"
     const val USERS = "users"
     const val SECRET = "qW8eR!2#tY6uIoLp"
-    const val HUGGING_KEY = "Bearer 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"
+//    const val HUGGING_KEY = "Bearer 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"
+    const val HUGGING_KEY = ""
 
 }
