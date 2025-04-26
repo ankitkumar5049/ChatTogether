@@ -15,7 +15,6 @@ object RetrofitInstance {
         .addInterceptor(loggingInterceptor)
         .addInterceptor { chain ->
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "")
                 .build()
             chain.proceed(request)
         }
