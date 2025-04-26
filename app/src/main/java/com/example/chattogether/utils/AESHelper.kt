@@ -1,14 +1,14 @@
 package com.example.chattogether.utils
 
 import android.util.Base64
-import com.example.chattogether.utils.Constant.SECRET
+import com.example.chattogether.utils.Constant.SEC
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
 object AESHelper {
 
     private fun getKeySpec(): SecretKeySpec {
-        return SecretKeySpec(SECRET.toByteArray(), "AES")
+        return SecretKeySpec(SEC.toByteArray(), "AES")
     }
 
     fun encrypt(input: String): String {
