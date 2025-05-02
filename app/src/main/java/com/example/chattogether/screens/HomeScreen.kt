@@ -109,7 +109,7 @@ fun UserList(users: List<User>, modifier: Modifier = Modifier) {
     else{
         LazyColumn(modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp)) {
+            .padding(10.dp)) {
             items(users) { user ->
                 UserItem(user)
             }

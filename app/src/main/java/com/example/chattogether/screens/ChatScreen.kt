@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -53,8 +54,10 @@ import com.example.chattogether.viewmodel.ChatViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.compose.ui.graphics.asImageBitmap
 import com.example.chattogether.components.CustomTopBar
 import com.example.chattogether.utils.AESHelper
+import com.example.chattogether.utils.decodeBase64ToBitmap
 
 @Composable
 fun ChatScreen(navController: NavController?, userId: String, otherUserId: String, viewModel: ChatViewModel = viewModel()) {
