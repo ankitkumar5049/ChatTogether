@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
         askNotificationPermission()
         setContent {
             ChatTogetherTheme {
+                window.statusBarColor = android.graphics.Color.parseColor("#179af5")
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

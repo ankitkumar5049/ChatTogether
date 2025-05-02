@@ -52,6 +52,8 @@ import com.example.chattogether.utils.AppSession
 import com.example.chattogether.viewmodel.ChatViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Scaffold
+import com.example.chattogether.components.CustomTopBar
 import com.example.chattogether.utils.AESHelper
 
 @Composable
@@ -101,69 +103,88 @@ fun ChatScreen(navController: NavController?, userId: String, otherUserId: Strin
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(10.dp)
-    ) {
-        Text(
-            text = "Chat Screen",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Start)
-                .padding(bottom = 10.dp),
-        )
-        Text(
-            text = "Chatting with $otherUserName",
-            style = MaterialTheme.typography.titleMedium,
-            fontSize = 18.sp,
-            color = Color.Gray,
-            modifier = Modifier.padding(bottom = 10.dp)
-        )
+    Scaffold(
+        topBar =
+        {
+            CustomTopBar(
+                text = "Let's Chat",
+                onMenuClick = {}
+            ) {
 
-        LazyColumn(
-            state = listState,
-            reverseLayout = true, // Ensures the latest message appears at the bottom
-            modifier = Modifier.weight(1f)
-        ) {
-            items(messages.reversed()) { msg -> // Reverse to maintain order
-                val senderId = msg["senderId"] as? String ?: ""
-                val text = msg["message"] as? String
-                val fileUrl = msg["fileUrl"] as? String
-                val type = msg["fileType"] as? String
-                val time = msg["formattedTime"] as? String ?: ""
-                val decryptedMsg = AESHelper.decrypt(text!!)
-                ChatBubble(decryptedMsg, fileUrl, type, senderId == userId, time)
             }
-        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        },
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(10.dp)
         ) {
-            OutlinedTextField(
-                value = message,
-                onValueChange = { message = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Type a message...") },
-                trailingIcon = {
-                    IconButton(onClick = { launcher.launch("*/*") }) {
-                        Icon(imageVector = Icons.Default.Attachment, contentDescription = "Attach File")
-                    }
-                }
+
+            Text(
+                text = "Chatting with $otherUserName",
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = 18.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 10.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Button(onClick = {
-                if (message.text.isNotBlank() && chatId != null) {
-                    val encryptText = AESHelper.encrypt(message.text)
-                    viewModel.sendMessage(db, chatId!!, userId, otherUserId, encryptText, null, null)
-                    message = TextFieldValue("")
+            LazyColumn(
+                state = listState,
+                reverseLayout = true,
+                modifier = Modifier.weight(1f)
+            ) {
+                items(messages.reversed()) { msg -> // Reverse to maintain order
+                    val senderId = msg["senderId"] as? String ?: ""
+                    val text = msg["message"] as? String
+                    val fileUrl = msg["fileUrl"] as? String
+                    val type = msg["fileType"] as? String
+                    val time = msg["formattedTime"] as? String ?: ""
+                    val decryptedMsg = AESHelper.decrypt(text!!)
+                    ChatBubble(decryptedMsg, fileUrl, type, senderId == userId, time)
                 }
-            }) {
-                Text("Send")
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = message,
+                    onValueChange = { message = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text("Type a message...") },
+                    trailingIcon = {
+                        IconButton(onClick = { launcher.launch("*/*") }) {
+                            Icon(
+                                imageVector = Icons.Default.Attachment,
+                                contentDescription = "Attach File"
+                            )
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Button(onClick = {
+                    if (message.text.isNotBlank() && chatId != null) {
+                        val encryptText = AESHelper.encrypt(message.text)
+                        viewModel.sendMessage(
+                            db,
+                            chatId!!,
+                            userId,
+                            otherUserId,
+                            encryptText,
+                            null,
+                            null
+                        )
+                        message = TextFieldValue("")
+                    }
+                }) {
+                    Text("Send")
+                }
             }
         }
     }

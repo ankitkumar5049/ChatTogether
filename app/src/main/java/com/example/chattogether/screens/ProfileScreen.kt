@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chattogether.R
+import com.example.chattogether.components.CustomTopBar
 import com.example.chattogether.components.LoaderOverlay
 import com.example.chattogether.viewmodel.ProfileViewModel
 
@@ -68,91 +70,120 @@ fun ProfileScreen(navController: NavController, profileViewModel: ProfileViewMod
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Spacer(modifier = Modifier.height(50.dp))
+    Scaffold(
+        topBar =
+        {
+            CustomTopBar(
+                text = "Profile",
+                onMenuClick = {}
+            ) {
 
-        // Profile Image
-        LoaderOverlay(isLoading = isLoading)
-        Image(
-            painter = painterResource(id = R.drawable.app_logo),
-            contentDescription = "Profile Image",
+            }
+
+        },
+    ) { paddingValues ->
+
+        Column(
             modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .border(2.dp, Color.White, CircleShape),
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // User Details Section
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
-                if (isEditing) {
-                    EditableProfileItem(label = "Name", value = name, onValueChange = { name = it })
-                    EditableProfileItem(label = "Username", value = username, onValueChange = { username = it })
-                    EditableProfileItem(label = "D.O.B", value = dob, onValueChange = { dob = it })
-                } else {
-                    ProfileItem(label = "Name", value = name)
-                    ProfileItem(label = "Username", value = username)
-                    ProfileItem(label = "D.O.B", value = dob)
+            Spacer(modifier = Modifier.height(50.dp))
+
+            // Profile Image
+            LoaderOverlay(isLoading = isLoading)
+            Image(
+                painter = painterResource(id = R.drawable.app_logo),
+                contentDescription = "Profile Image",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.White, CircleShape),
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // User Details Section
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    if (isEditing) {
+                        EditableProfileItem(
+                            label = "Name",
+                            value = name,
+                            onValueChange = { name = it })
+                        EditableProfileItem(
+                            label = "Username",
+                            value = username,
+                            onValueChange = { username = it })
+                        EditableProfileItem(
+                            label = "D.O.B",
+                            value = dob,
+                            onValueChange = { dob = it })
+                    } else {
+                        ProfileItem(label = "Name", value = name)
+                        ProfileItem(label = "Username", value = username)
+                        ProfileItem(label = "D.O.B", value = dob)
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-        if (isEditing) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Button(
-                    onClick = {
-                        profileViewModel.updateUserInFirebase(name, username, dob){ success ->
-                            if(success){
-                                profileViewModel.getUserDetails { user ->
-                                    if (user != null) {
-                                        username = user.username
-                                        name = user.name
-                                        dob = user.dob
+            if (isEditing) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            profileViewModel.updateUserInFirebase(name, username, dob) { success ->
+                                if (success) {
+                                    profileViewModel.getUserDetails { user ->
+                                        if (user != null) {
+                                            username = user.username
+                                            name = user.name
+                                            dob = user.dob
+                                        }
                                     }
+                                    Toast.makeText(context, "Details Updated", Toast.LENGTH_SHORT)
+                                        .show()
+                                    navController.popBackStack()
+                                } else {
+                                    Toast.makeText(context, "Error in updating", Toast.LENGTH_SHORT)
+                                        .show()
                                 }
-                                Toast.makeText(context, "Details Updated", Toast.LENGTH_SHORT).show()
-                                navController.popBackStack()
-                            }
-                            else{
-                                Toast.makeText(context, "Error in updating", Toast.LENGTH_SHORT).show()
-                            }
 
-                        }
-                        isEditing = false
+                            }
+                            isEditing = false
 
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                ) {
-                    Text(text = "Save")
-                }
-                Button(
-                    onClick = {
-                        isEditing = false
-                        navController.popBackStack() },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-                ) {
-                    Text(text = "Cancel")
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    ) {
+                        Text(text = "Save")
+                    }
+                    Button(
+                        onClick = {
+                            isEditing = false
+                            navController.popBackStack()
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    ) {
+                        Text(text = "Cancel")
+                    }
                 }
             }
-        }
 
+        }
     }
 }
 

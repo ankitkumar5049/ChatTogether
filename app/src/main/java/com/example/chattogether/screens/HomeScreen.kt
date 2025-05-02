@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.chattogether.components.CustomTopBar
 import com.example.chattogether.model.User
 import com.example.chattogether.viewmodel.HomeViewModel
 
@@ -48,34 +49,42 @@ fun HomeScreen(homeViewModel: HomeViewModel = viewModel()) {
         homeViewModel.fetchFirst20Users()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text(
-            text = "All Users",
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.Start)
-                .padding(top = 15.dp),
-            style = MaterialTheme.typography.headlineMedium
-        )
 
-        Scaffold(
-        ) { paddingValues ->
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+    Scaffold(
+        topBar =
+        {
+            CustomTopBar(
+                text = "All Users",
+                onMenuClick = {}
+            ) {
+
+            }
+
+        },
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+
+            Scaffold(
+            ) { paddingValues ->
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    UserList(users, Modifier.padding(paddingValues))
                 }
-            } else {
-                UserList(users, Modifier.padding(paddingValues))
             }
         }
     }
