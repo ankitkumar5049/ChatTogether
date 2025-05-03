@@ -54,7 +54,7 @@ fun HomeScreen(homeViewModel: HomeViewModel = viewModel()) {
         topBar =
         {
             CustomTopBar(
-                text = "All Users",
+                text = "Chat Together",
                 onMenuClick = {}
             ) {
 
